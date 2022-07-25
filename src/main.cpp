@@ -1,3 +1,4 @@
+#include <engine/config.hpp>
 #include <engine/context.hpp>
 #include <engine/env.hpp>
 #include <game/consumable.hpp>
@@ -11,15 +12,19 @@
 
 namespace {
 std::optional<rr::Context> makeContext(int argc, char const* const argv[]) {
+	auto env = rr::Env::make(argc, argv);
+	auto config = rr::Config::Scoped(rr::exePath(env, "config.txt"));
 	auto builder = vf::Builder{};
+	builder.setExtent(config.config.extent).setAntiAliasing(config.config.antiAliasing);
 	// builder.setExtent({1920, 1080});
 	auto vf = builder.build();
 	if (!vf) {
 		logger::error("Failed to create vulkify instance");
 		return {};
 	}
-	auto ret = rr::Context{rr::Env::make(argc, argv), {}, std::move(*vf)};
+	auto ret = rr::Context{.env = std::move(env), .vfContext = std::move(*vf)};
 	ret.capoInstance = ktl::make_unique<capo::Instance>();
+	ret.config = std::move(config);
 	ret.basis.scale = ret.basisScale(ret.vfContext.framebufferExtent());
 	ret.audio = *ret.capoInstance;
 	return ret;

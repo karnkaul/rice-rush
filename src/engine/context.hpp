@@ -4,6 +4,7 @@
 
 #include <engine/audio.hpp>
 #include <engine/basis.hpp>
+#include <engine/config.hpp>
 #include <engine/env.hpp>
 
 namespace rr {
@@ -11,6 +12,7 @@ struct Context {
 	Env env{};
 	ktl::kunique_ptr<capo::Instance> capoInstance{};
 	vf::Context vfContext;
+	Config::Scoped config{};
 
 	Audio audio{};
 	Basis basis{};

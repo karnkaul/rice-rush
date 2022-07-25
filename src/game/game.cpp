@@ -43,6 +43,7 @@ Game::Game(Context& context) : context(context), m_impl(ktl::make_unique<Impl>(c
 
 	m_player = ktl::make_unique<Player>();
 	setup(*m_player, {});
+	m_player->name = context.config.config.playerName;
 }
 
 void Game::attach(Ptr<KeyListener> listener) {

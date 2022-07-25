@@ -11,9 +11,10 @@ void Hud::setup() {
 	auto& vfc = game()->context.vfContext;
 	m_health = {vfc, "health"};
 	m_score = {vfc, "score"};
+	auto const extent = glm::vec2(vfc.framebufferExtent());
 
-	auto const size = basis().space * glm::vec2(1.0f, layout().nPadY * 0.5f);
-	auto const y = 0.5f * (basis().space.y - size.y);
+	auto const size = extent * glm::vec2(1.0f, layout().nPadY * 0.5f);
+	auto const y = 0.5f * (extent.y - size.y);
 
 	auto& resources = game()->resources();
 	m_score.transform().position.y = y;

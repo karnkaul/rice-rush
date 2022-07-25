@@ -27,6 +27,7 @@ Env Env::make(int argc, char const* const* argv) {
 } // namespace rr
 
 std::string rr::dataPath(Env const& env, std::string_view uri) { return (stdfs::path(env.paths.data) / uri).generic_string(); }
+std::string rr::exePath(Env const& env, std::string_view uri) { return (stdfs::path(env.paths.exe).parent_path() / uri).generic_string(); }
 
 std::vector<std::string> rr::fileList(Env const& env, std::string_view dir, std::string_view ext) {
 	auto ret = std::vector<std::string>{};

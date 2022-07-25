@@ -10,6 +10,7 @@ class Pawn;
 class Player : public GameObject {
   public:
 	Controller controller{};
+	std::string name{};
 	Trigger trigger{};
 	float speed{500.0f};
 	int maxHp{3};

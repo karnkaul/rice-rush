@@ -1,6 +1,8 @@
 target_sources(${PROJECT_NAME} PRIVATE
   engine/audio.hpp
   engine/basis.hpp
+  engine/config.cpp
+  engine/config.hpp
   engine/context.hpp
   engine/delta_time.hpp
   engine/env.cpp
