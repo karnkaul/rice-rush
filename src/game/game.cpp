@@ -3,6 +3,7 @@
 #include <engine/trigger_renderer.hpp>
 #include <game/cooker_pool.hpp>
 #include <game/game.hpp>
+#include <game/hud.hpp>
 #include <game/player.hpp>
 #include <game/resources.hpp>
 #include <util/logger.hpp>
@@ -66,6 +67,9 @@ void Game::handle(std::span<vf::Event const> events) {
 }
 
 void Game::tick(vf::Time dt) {
+	m_state.elapsed += dt;
+	m_framerate.tick(dt);
+	transferSpawned();
 	auto const dlt = DeltaTime{.real = dt, .scaled = dt * timeScale};
 	if (m_state.state == State::ePlay) {
 		tick(player(), dlt);
@@ -102,6 +106,7 @@ void Game::set(State state) {
 		m_state.state = state;
 		m_player->reset();
 		m_cookerPool = spawn<CookerPool>({});
+		m_hud = spawn<Hud>({});
 		logger::info("[Game] play");
 		break;
 	}
@@ -130,4 +135,11 @@ void Game::tick(std::vector<ktl::kunique_ptr<T>>& vec, DeltaTime dt) {
 void Game::tick(GameObject& go, DeltaTime dt) { go.tick(dt); }
 
 void Game::addTriggers(std::vector<Ptr<Trigger const>>& out, GameObject const& obj) { obj.addTriggers(out); }
+
+void Game::transferSpawned() {
+	if (m_state.spawned.empty()) { return; }
+	m_state.objects.reserve(m_state.objects.size() + m_state.spawned.size());
+	std::move(m_state.spawned.begin(), m_state.spawned.end(), std::back_inserter(m_state.objects));
+	m_state.spawned.clear();
+}
 } // namespace rr

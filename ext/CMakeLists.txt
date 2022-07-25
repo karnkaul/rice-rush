@@ -14,7 +14,7 @@ FetchContent_MakeAvailable(capo)
 FetchContent_Declare(
   vulkify
   GIT_REPOSITORY https://github.com/vulkify/vulkify
-  GIT_TAG 6fccae2 # change to version tag after all bug-fixes etc
+  GIT_TAG 0968c90 # change to version tag after all bug-fixes etc
   SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/vulkify"
 )
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <engine/framerate.hpp>
 #include <engine/keyboard.hpp>
 #include <game/game_object.hpp>
 #include <game/layout.hpp>
@@ -19,6 +20,7 @@ struct Resources;
 class Player;
 class Pawn;
 class CookerPool;
+class Hud;
 
 class Game;
 
@@ -52,7 +54,7 @@ class Game {
 		auto t = ktl::make_unique<T>(std::forward<Args>(args)...);
 		setup(*t, position);
 		auto ret = t.get();
-		m_state.objects.push_back(std::move(t));
+		m_state.spawned.push_back(std::move(t));
 		return ret;
 	}
 
@@ -61,6 +63,8 @@ class Game {
 	Audio& audio() const;
 	Player& player() const { return *m_player; }
 	Ptr<CookerPool> cookerPool() const { return m_cookerPool; }
+	vf::Time elapsed() const { return m_state.elapsed; }
+	Framerate const& framerate() const { return m_framerate; }
 
 	void handle(std::span<vf::Event const> events);
 	void tick(vf::Time dt);
@@ -76,6 +80,7 @@ class Game {
 	static void tick(std::vector<ktl::kunique_ptr<T>>& vec, DeltaTime dt);
 	static void tick(GameObject& go, DeltaTime dt);
 	static void addTriggers(std::vector<Ptr<Trigger const>>& out, GameObject const& obj);
+	void transferSpawned();
 
 	struct AddToDrawList;
 	struct Impl;
@@ -83,9 +88,13 @@ class Game {
 
 	struct {
 		std::vector<ktl::kunique_ptr<GameObject>> objects{};
+		std::vector<ktl::kunique_ptr<GameObject>> spawned{};
 		State state{};
+		vf::Time elapsed{};
 	} m_state{};
 	ktl::kunique_ptr<Player> m_player{};
 	Ptr<CookerPool> m_cookerPool{};
+	Ptr<Hud> m_hud{};
+	Framerate m_framerate{};
 };
 } // namespace rr

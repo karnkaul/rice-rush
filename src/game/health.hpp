@@ -33,6 +33,8 @@ class Health {
 		return *this;
 	}
 
+	constexpr bool isImmune() const { return m_state == State::eImmune; }
+
   private:
 	enum class State { eNormal, eImmune };
 

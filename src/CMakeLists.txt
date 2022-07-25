@@ -28,6 +28,8 @@ target_sources(${PROJECT_NAME} PRIVATE
   game/game_object.hpp
   game/game.cpp
   game/game.hpp
+  game/hud.cpp
+  game/hud.hpp
   game/layout.hpp
   game/pawn.hpp
   game/player.cpp

@@ -26,6 +26,7 @@ class Player : public GameObject {
 	Health const& health() const { return m_state.health; }
 
   private:
+	void setup() override { layer = layers::player; }
 	void tick(DeltaTime dt) override;
 
 	struct {

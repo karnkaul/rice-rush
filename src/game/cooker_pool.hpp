@@ -23,7 +23,6 @@ class CookerPool : public GameObject {
 		Points points{};
 	};
 
-	void setup() override { layer = 10; }
 	void tick(DeltaTime dt) override;
 	void draw(vf::Frame const& frame) const override;
 	void addTriggers(std::vector<Ptr<Trigger const>>& out) const override;
