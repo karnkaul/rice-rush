@@ -60,16 +60,17 @@ struct DebugControls : rr::KeyListener {
 	rr::Ptr<rr::Game> game{};
 
 	void operator()(vf::KeyEvent const& key) override {
-		auto const zone = game->layout.playArea * 0.5f;
+		auto const zone = game->layout.playArea.extent * 0.5f;
+		auto const offset = +game->layout.playArea.offset;
 		if (key(vf::Key::eEnter, vf::Action::ePress)) {
 			// auto cooker = game->spawn<rr::Cooker>(randomRange(-zone, zone));
 			// cooker->text = vf::Text(game->context.vfContext, "cooker");
 			// cooker->text.setFont(&game->resources().fonts.main);
 			// cooker->text.setHeight(40);
-			game->cookerPool()->spawn(randomRange(-zone, zone), vf::Time(randomRange(2.0f, 5.0f)));
+			game->cookerPool()->spawn(randomRange(-zone, zone) + offset, vf::Time(randomRange(2.0f, 5.0f)));
 		}
 		if (key(vf::Key::eBackslash, vf::Action::ePress)) {
-			auto consumable = game->spawn<OneUp>(randomRange(-zone, zone));
+			auto consumable = game->spawn<OneUp>(randomRange(-zone, zone) + offset);
 			consumable->sprite.setSize({50.0f, 50.0f});
 			consumable->trigger.diameter = 75.0f;
 		}

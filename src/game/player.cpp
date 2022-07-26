@@ -27,9 +27,11 @@ Ptr<T> refresh(std::span<ktl::kunique_ptr<T> const> ts, Trigger& player) {
 	return nearest.t;
 }
 
-constexpr glm::vec2 clamp(glm::vec2 in, glm::vec2 const a, glm::vec2 const b) {
-	in.x = std::clamp(in.x, a.x, b.x);
-	in.y = std::clamp(in.y, a.y, b.y);
+constexpr glm::vec2 clamp(glm::vec2 in, vf::Rect const& playArea, glm::vec2 const pad) {
+	auto const bl = playArea.bottomLeft() + pad;
+	auto const tr = playArea.topRight() - pad;
+	in.x = std::clamp(in.x, bl.x, tr.x);
+	in.y = std::clamp(in.y, bl.y, tr.y);
 	return in;
 }
 } // namespace
@@ -37,8 +39,7 @@ constexpr glm::vec2 clamp(glm::vec2 in, glm::vec2 const a, glm::vec2 const b) {
 void Player::translate(glm::vec2 xy) {
 	auto& pos = sprite.instance().transform.position;
 	pos += xy;
-	auto const hs = 0.5f * (layout().playArea - sprite.quad().size());
-	trigger.centre = pos = clamp(pos, -hs, hs);
+	trigger.centre = pos = clamp(pos, game()->layout.playArea, sprite.quad().size() * 0.5f);
 }
 
 void Player::collect(std::uint32_t points, bool incrementMultiplier) {

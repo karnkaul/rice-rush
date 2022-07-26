@@ -38,11 +38,14 @@ struct Game::AddToDrawList {
 
 Game::Game(Context& context) : context(context), m_impl(ktl::make_unique<Impl>(context)) {
 	layout.basis = context.basis;
-	layout.playArea = layout.basis.scale * layout.basis.space;
-	layout.playArea.y *= (1.0f - layout.nPadY);
+	layout.playArea.extent = layout.basis.scale * layout.basis.space;
+	layout.playArea.extent.y *= (1.0f - layout.nPadY);
+	layout.playArea.offset.y = -0.5f * (layout.basis.scale * layout.basis.space.y - layout.playArea.extent.y);
+	layout.hud.extent = {layout.playArea.extent.x, layout.basis.scale * layout.basis.space.y - layout.playArea.extent.y};
+	layout.hud.offset.y = 0.5f * layout.playArea.extent.y;
 
 	m_player = ktl::make_unique<Player>();
-	setup(*m_player, {});
+	setup(*m_player, layout.playArea.offset);
 	m_player->name = context.config.config.playerName;
 }
 

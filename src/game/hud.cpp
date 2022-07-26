@@ -11,27 +11,30 @@ void Hud::setup() {
 	auto& vfc = game()->context.vfContext;
 	m_health = {vfc, "health"};
 	m_score = {vfc, "score"};
-	auto const extent = glm::vec2(vfc.framebufferExtent());
-
-	auto const size = extent * glm::vec2(1.0f, layout().nPadY * 0.5f);
-	auto const y = 0.5f * (extent.y - size.y);
 
 	auto& resources = game()->resources();
-	m_score.transform().position.y = y;
-	m_score.setFont(&resources.fonts.main).setHeight(static_cast<vf::Text::Height>(size.y * 0.5f));
+	auto& hud = layout().hud;
+
+	m_background = vf::Mesh(vfc, "hud_background");
+	m_background.gbo.write(vf::Geometry::makeQuad({hud.extent}));
+	m_background.instance.transform.position = hud.offset;
+	m_background.instance.tint = bgColour;
+
+	m_score.transform().position = layout().hud.offset;
+	m_score.setFont(&resources.fonts.main).setHeight(static_cast<vf::Text::Height>(hud.extent.y * 0.6f));
 
 	auto his = healthIconSize * basis().scale;
-	auto healthX = 0.5f * (-size.x + his) + his;
+	auto healthX = hud.offset.x + 0.5f * (-hud.extent.x + his) + his;
 	for (int i = 0; i < game()->player().maxHp; ++i) {
-		m_health.instances.push_back(vf::DrawInstance{vf::Transform{{healthX, y}}});
+		m_health.instances.push_back(vf::DrawInstance{vf::Transform{{healthX, hud.offset.y}}});
 		healthX += 2.0f * his;
 	}
 	m_health.gbo.write(vf::Geometry::makeQuad(vf::QuadCreateInfo{{his, his}}));
 
 	if constexpr (debug_v) {
 		m_debug = {vfc, "debug"};
-		m_debug.transform().position = {0.5f * size.x - 50.0f * basis().scale, y};
-		m_debug.setFont(&resources.fonts.main).setHeight(static_cast<vf::Text::Height>(size.y * 0.3f)).setAlign({vf::Text::Horz::eRight});
+		m_debug.transform().position = {hud.offset.x + 0.5f * hud.extent.x - layout().basis.scale * 50.0f, hud.offset.y};
+		m_debug.setFont(&resources.fonts.main).setHeight(static_cast<vf::Text::Height>(hud.extent.y * 0.2f)).setAlign({vf::Text::Horz::eRight});
 	}
 }
 
@@ -69,6 +72,7 @@ void Hud::tick(DeltaTime dt) {
 }
 
 void Hud::draw(vf::Frame const& frame) const {
+	frame.draw(m_background);
 	frame.draw(m_health);
 	frame.draw(m_score);
 	if constexpr (debug_v) { frame.draw(m_debug); }
