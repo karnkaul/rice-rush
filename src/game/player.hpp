@@ -12,7 +12,6 @@ class Player : public GameObject {
   public:
 	Controller controller{};
 	std::string name{};
-	SequencedIndex run_anim{};
 	Trigger trigger{};
 	float speed{500.0f};
 	int max_hp{3};

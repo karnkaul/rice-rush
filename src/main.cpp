@@ -14,6 +14,8 @@
 #include <util/util.hpp>
 
 namespace {
+using namespace std::chrono_literals;
+
 std::optional<rr::Context> make_context(int argc, char const* const argv[]) {
 	auto env = rr::Env::make(argc, argv);
 	auto config = rr::Config::Scoped(rr::exe_path(env, "config.txt"));
@@ -94,11 +96,7 @@ void run(rr::Context context) {
 
 	game.set(rr::Game::State::ePlay);
 	auto const player_size = game.layout.basis.scale * glm::vec2{150.0f};
-	game.player().sprite.set_sheet(&player_sheet).set_size(player_size);
-	auto seq = rr::SequencedIndex::Sequence{};
-	seq.indices = rr::make_sequence_indices(player_sheet.uv_count());
-	seq.duration = std::chrono::milliseconds(300);
-	game.player().run_anim.set(std::move(seq));
+	game.player().sprite.set_sheet(player_sheet, 0.3s).set_size(player_size);
 	auto const cooker_size = game.layout.basis.scale * glm::vec2{75.0f};
 	game.cooker_pool()->set_prefab({.size = cooker_size, .texture = cooker_sheet.texture().handle()});
 

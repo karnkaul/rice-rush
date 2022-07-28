@@ -1,4 +1,6 @@
 target_sources(${PROJECT_NAME} PRIVATE
+  engine/animated_sprite.cpp
+  engine/animated_sprite.hpp
   engine/audio.hpp
   engine/basis.hpp
   engine/config.cpp

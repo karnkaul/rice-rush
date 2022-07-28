@@ -1,6 +1,6 @@
 #pragma once
+#include <engine/animated_sprite.hpp>
 #include <engine/delta_time.hpp>
-#include <engine/sprite.hpp>
 #include <game/layout.hpp>
 
 namespace rr {
@@ -19,7 +19,7 @@ class GameObject {
 	void destroy() { m_destroyed = true; }
 	bool destroyed() const { return m_destroyed; }
 
-	Sprite sprite{};
+	AnimatedSprite sprite{};
 	int layer{};
 
   protected:

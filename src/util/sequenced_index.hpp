@@ -9,14 +9,17 @@ using namespace std::chrono_literals;
 class SequencedIndex {
   public:
 	struct Sequence {
-		std::vector<std::size_t> indices{};
 		vf::Time duration{1s};
+		std::size_t end{};
+		std::size_t begin{};
+
+		constexpr std::size_t length() const { return end - begin; }
 	};
 
-	SequencedIndex& set(Sequence sequence, std::size_t index = 0);
+	SequencedIndex& set(Sequence sequence);
 
 	void tick(vf::Time dt);
-	std::size_t index() const { return m_index; }
+	std::size_t index() const { return m_active.index; }
 
   protected:
 	struct Active {
@@ -26,8 +29,5 @@ class SequencedIndex {
 
 	Sequence m_sequence{};
 	Active m_active{};
-	std::size_t m_index{};
 };
-
-std::vector<std::size_t> make_sequence_indices(std::size_t count, std::size_t offset = 0);
 } // namespace rr

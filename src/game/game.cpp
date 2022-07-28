@@ -128,7 +128,7 @@ void Game::on_key(vf::KeyEvent const& key) {
 }
 
 void Game::setup(GameObject& out, glm::vec2 position) {
-	out.sprite = Sprite(context);
+	out.sprite = AnimatedSprite(context);
 	out.sprite.instance().transform.position = position;
 	out.m_game = this;
 	out.setup();
