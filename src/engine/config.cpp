@@ -10,7 +10,7 @@ std::string trim(std::string_view str) {
 	return std::string(str);
 }
 
-std::pair<std::string, std::string> getProperty(std::ifstream& file) {
+std::pair<std::string, std::string> get_property(std::ifstream& file) {
 	auto line = std::string{};
 	std::getline(file, line);
 	auto const eq = line.find('=');
@@ -54,7 +54,7 @@ Config Config::Scoped::load(const char* path) {
 	auto file = std::ifstream(path);
 	if (!file) { return ret; }
 	while (file) {
-		auto [key, value] = getProperty(file);
+		auto [key, value] = get_property(file);
 		if (key.empty()) { continue; }
 		populate(ret, key, std::move(value));
 	}

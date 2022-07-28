@@ -29,7 +29,7 @@ struct TArray {
 	std::size_t size{};
 };
 
-std::string dataPath(Env const& env, std::string_view uri);
-std::string exePath(Env const& env, std::string_view uri);
-std::vector<std::string> fileList(Env const& env, std::string_view dir, std::string_view ext);
+std::string data_path(Env const& env, std::string_view uri);
+std::string exe_path(Env const& env, std::string_view uri);
+std::vector<std::string> file_list(Env const& env, std::string_view dir, std::string_view ext);
 } // namespace rr

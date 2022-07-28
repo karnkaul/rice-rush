@@ -13,22 +13,22 @@
 namespace rr {
 struct Game::Impl {
 	Resources resources{};
-	rr::TriggerRenderer triggerRenderer;
+	rr::TriggerRenderer trigger_renderer;
 	std::vector<Ptr<Trigger const>> triggers{};
 	Keyboard keyboard{};
 	Audio audio{};
 	std::vector<Ptr<KeyListener>> listeners{};
-	std::vector<Ptr<GameObject const>> drawList{};
+	std::vector<Ptr<GameObject const>> draw_list{};
 
-	Impl(Context& context) : triggerRenderer(context) {}
+	Impl(Context& context) : trigger_renderer(context) {}
 };
 
 struct Game::AddToDrawList {
 	Game const& game;
-	void add(Ptr<GameObject const> go) const { game.m_impl->drawList.push_back(go); }
+	void add(Ptr<GameObject const> go) const { game.m_impl->draw_list.push_back(go); }
 	template <typename T>
 	void add(std::vector<ktl::kunique_ptr<T>> const& vec) const {
-		for (auto const& t : vec) { game.m_impl->drawList.push_back(t.get()); }
+		for (auto const& t : vec) { game.m_impl->draw_list.push_back(t.get()); }
 	}
 
 	template <typename... T>
@@ -39,18 +39,17 @@ struct Game::AddToDrawList {
 
 Game::Game(Context& context) : context(context), m_impl(ktl::make_unique<Impl>(context)) {
 	layout.basis = context.basis;
-	layout.playArea.extent = layout.basis.scale * layout.basis.space;
-	layout.playArea.extent.y *= (1.0f - layout.nPadY);
-	layout.playArea.offset.y = -0.5f * (layout.basis.scale * layout.basis.space.y - layout.playArea.extent.y);
-	layout.hud.extent = {layout.playArea.extent.x, layout.basis.scale * layout.basis.space.y - layout.playArea.extent.y};
-	layout.hud.offset.y = 0.5f * layout.playArea.extent.y;
+	layout.play_area.extent = layout.basis.scale * layout.basis.space;
+	layout.play_area.extent.y *= (1.0f - layout.n_pad_y);
+	layout.play_area.offset.y = -0.5f * (layout.basis.scale * layout.basis.space.y - layout.play_area.extent.y);
+	layout.hud.extent = {layout.play_area.extent.x, layout.basis.scale * layout.basis.space.y - layout.play_area.extent.y};
+	layout.hud.offset.y = 0.5f * layout.play_area.extent.y;
 
 	m_player = ktl::make_unique<Player>();
-	setup(*m_player, layout.playArea.offset);
+	setup(*m_player, layout.play_area.offset);
 	m_player->name = context.config.config.playerName;
 
-	m_background = ktl::make_unique<Background>();
-	setup(*m_background, {});
+	m_background = ktl::make_unique<Background>(*this);
 }
 
 void Game::attach(Ptr<KeyListener> listener) {
@@ -68,7 +67,7 @@ Audio& Game::audio() const { return m_impl->audio; }
 void Game::handle(std::span<vf::Event const> events) {
 	for (auto const& event : events) {
 		switch (event.type) {
-		case vf::EventType::eKey: onKey(event.get<vf::EventType::eKey>()); break;
+		case vf::EventType::eKey: on_key(event.get<vf::EventType::eKey>()); break;
 		default: break;
 		}
 	}
@@ -77,8 +76,8 @@ void Game::handle(std::span<vf::Event const> events) {
 void Game::tick(vf::Time dt) {
 	m_state.elapsed += dt;
 	m_framerate.tick(dt);
-	transferSpawned();
-	auto const dlt = DeltaTime{.real = dt, .scaled = dt * timeScale};
+	transfer_spawned();
+	auto const dlt = DeltaTime{.real = dt, .scaled = dt * time_scale};
 	if (m_state.state == State::ePlay) {
 		tick(player(), dlt);
 		if (player().health().hp <= 0) { set(State::eOver); }
@@ -87,19 +86,19 @@ void Game::tick(vf::Time dt) {
 }
 
 void Game::render(vf::Frame const& frame) const {
-	static_cast<GameObject*>(m_background.get())->draw(frame);
+	m_background->draw(frame);
 	if (flags.test(Flag::eRenderTriggers)) {
 		m_impl->triggers.clear();
 		m_impl->triggers.push_back(&m_player->trigger);
-		for (auto const& obj : m_state.objects) { addTriggers(m_impl->triggers, *obj); }
-		m_impl->triggerRenderer.render(m_impl->triggers, frame);
+		for (auto const& obj : m_state.objects) { add_triggers(m_impl->triggers, *obj); }
+		m_impl->trigger_renderer.render(m_impl->triggers, frame);
 	}
-	m_impl->drawList.clear();
-	m_impl->drawList.reserve(m_state.objects.size() + +1);
+	m_impl->draw_list.clear();
+	m_impl->draw_list.reserve(m_state.objects.size() + +1);
 	AddToDrawList{*this}(m_state.objects, m_player.get());
 	static constexpr auto cmp = [](Ptr<GameObject const> a, Ptr<GameObject const> b) { return a->layer < b->layer; };
-	std::sort(m_impl->drawList.begin(), m_impl->drawList.end(), cmp);
-	for (auto const* obj : m_impl->drawList) { obj->draw(frame); }
+	std::sort(m_impl->draw_list.begin(), m_impl->draw_list.end(), cmp);
+	for (auto const* obj : m_impl->draw_list) { obj->draw(frame); }
 }
 
 void Game::set(State state) {
@@ -114,7 +113,7 @@ void Game::set(State state) {
 		m_state = {};
 		m_state.state = state;
 		m_player->reset();
-		m_cookerPool = spawn<CookerPool>({});
+		m_cooker_pool = spawn<CookerPool>({});
 		m_hud = spawn<Hud>({});
 		logger::info("[Game] play");
 		break;
@@ -123,9 +122,9 @@ void Game::set(State state) {
 	}
 }
 
-void Game::onKey(vf::KeyEvent const& key) {
+void Game::on_key(vf::KeyEvent const& key) {
 	for (auto* listener : m_impl->listeners) { (*listener)(key); }
-	m_impl->keyboard.onKey(key);
+	m_impl->keyboard.on_key(key);
 }
 
 void Game::setup(GameObject& out, glm::vec2 position) {
@@ -143,9 +142,9 @@ void Game::tick(std::vector<ktl::kunique_ptr<T>>& vec, DeltaTime dt) {
 
 void Game::tick(GameObject& go, DeltaTime dt) { go.tick(dt); }
 
-void Game::addTriggers(std::vector<Ptr<Trigger const>>& out, GameObject const& obj) { obj.addTriggers(out); }
+void Game::add_triggers(std::vector<Ptr<Trigger const>>& out, GameObject const& obj) { obj.add_triggers(out); }
 
-void Game::transferSpawned() {
+void Game::transfer_spawned() {
 	if (m_state.spawned.empty()) { return; }
 	m_state.objects.reserve(m_state.objects.size() + m_state.spawned.size());
 	std::move(m_state.spawned.begin(), m_state.spawned.end(), std::back_inserter(m_state.objects));

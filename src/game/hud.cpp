@@ -8,7 +8,7 @@
 namespace rr {
 void Hud::setup() {
 	layer = layers::hud;
-	auto& vfc = game()->context.vfContext;
+	auto& vfc = game()->context.vf_context;
 	m_health = {vfc, "health"};
 	m_score = {vfc, "score"};
 
@@ -18,14 +18,14 @@ void Hud::setup() {
 	m_background = vf::Mesh(vfc, "hud_background");
 	m_background.gbo.write(vf::Geometry::makeQuad({hud.extent}));
 	m_background.instance.transform.position = hud.offset;
-	m_background.instance.tint = bgColour;
+	m_background.instance.tint = bg_tint;
 
 	m_score.transform().position = layout().hud.offset;
 	m_score.setFont(&resources.fonts.main).setHeight(static_cast<vf::Text::Height>(hud.extent.y * 0.6f));
 
-	auto his = healthIconSize * basis().scale;
+	auto his = health_icon_size * basis().scale;
 	auto healthX = hud.offset.x + 0.5f * (-hud.extent.x + his) + his;
-	for (int i = 0; i < game()->player().maxHp; ++i) {
+	for (int i = 0; i < game()->player().max_hp; ++i) {
 		m_health.instances.push_back(vf::DrawInstance{vf::Transform{{healthX, hud.offset.y}}});
 		healthX += 2.0f * his;
 	}
@@ -48,27 +48,27 @@ void Hud::tick(DeltaTime dt) {
 
 	auto const& health = game()->player().health();
 	auto hp = static_cast<std::size_t>(std::clamp(health.hp, 0, static_cast<int>(m_health.instances.size())));
-	if (health.isImmune()) {
-		m_hurtElapsed += dt.real;
-		if (m_hurtElapsed >= hurtPulse) {
-			m_hurtElapsed = {};
-			m_hurtPulseUp = !m_hurtPulseUp;
+	if (health.is_immune()) {
+		m_hurt_elapsed += dt.real;
+		if (m_hurt_elapsed >= hurt_pulse) {
+			m_hurt_elapsed = {};
+			m_hurt_pulse_up = !m_hurt_pulse_up;
 		}
 	} else {
-		m_hurtElapsed = {};
-		m_hurtPulseUp = false;
+		m_hurt_elapsed = {};
+		m_hurt_pulse_up = false;
 	}
-	if (m_hurtPulseUp) { ++hp; }
+	if (m_hurt_pulse_up) { ++hp; }
 	for (std::size_t i = 0; i < hp; ++i) {
 		m_health.instances[i].tint.channels[3] = 0xff;
 		m_health.instances[i].transform.scale = {1.0f, 1.0f};
 	}
 	for (std::size_t i = hp; i < m_health.instances.size(); ++i) {
-		m_health.instances[i].tint.channels[3] = healthLostAlpha;
-		m_health.instances[i].transform.scale = {healthLostScale, healthLostScale};
+		m_health.instances[i].tint.channels[3] = health_lost_alpha;
+		m_health.instances[i].transform.scale = {health_lost_scale, health_lost_scale};
 	}
 
-	if constexpr (debug_v) { m_debug.setString(ktl::kformat("{} FPS\t{}", game()->framerate().fps(), util::formatElapsed(game()->elapsed()))); }
+	if constexpr (debug_v) { m_debug.setString(ktl::kformat("{} FPS\t{}", game()->framerate().fps(), util::format_elapsed(game()->elapsed()))); }
 }
 
 void Hud::draw(vf::Frame const& frame) const {

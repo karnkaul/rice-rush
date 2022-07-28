@@ -33,10 +33,10 @@ class CookerPool : public GameObject {
 
 	void tick(DeltaTime dt) override;
 	void draw(vf::Frame const& frame) const override;
-	void addTriggers(std::vector<Ptr<Trigger const>>& out) const override;
+	void add_triggers(std::vector<Ptr<Trigger const>>& out) const override;
 
-	std::vector<Entry>::iterator updateTriggersAndGetNearest(Trigger& player, vf::Time dt);
-	void spawnCollect(glm::vec2 position) const;
+	Ptr<Entry> update_and_get_nearest(Trigger& player, vf::Time dt);
+	void spawn_collect(glm::vec2 position) const;
 	void pop(Entry& entry);
 
 	std::vector<Entry> m_entries{};

@@ -6,7 +6,7 @@
 #include <sstream>
 
 namespace rr {
-std::string util::formatElapsed(vf::Time elapsed) {
+std::string util::format_elapsed(vf::Time elapsed) {
 	auto const h = std::chrono::duration_cast<std::chrono::hours>(elapsed);
 	auto const m = std::chrono::duration_cast<std::chrono::minutes>(elapsed) - h;
 	auto const s = std::chrono::duration_cast<std::chrono::seconds>(elapsed) - h - m;
@@ -25,12 +25,12 @@ std::string util::formatElapsed(vf::Time elapsed) {
 	return str.str();
 }
 
-vf::Texture util::makeTexture(Context const& context, std::string_view uri) {
+vf::Texture util::make_texture(Context const& context, std::string_view uri) {
 	auto image = vf::Image{};
-	if (!image.load(rr::dataPath(context.env, "textures/awesomeface.png").c_str())) {
+	if (!image.load(rr::data_path(context.env, "textures/awesomeface.png").c_str())) {
 		logger::error("[Resources] Failed to load Image [{}]", uri);
 		return {};
 	}
-	return vf::Texture(context.vfContext, std::string(uri), image);
+	return vf::Texture(context.vf_context, std::string(uri), image);
 }
 } // namespace rr

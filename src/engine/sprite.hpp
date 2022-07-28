@@ -11,9 +11,9 @@ class Sprite {
 	Sprite() = default;
 	explicit Sprite(Context const& context, std::string name = "sprite");
 
-	Sprite& setSize(glm::vec2 size);
-	Sprite& setUvIndex(std::size_t index);
-	Sprite& setSheet(Ptr<Sheet const> sheet);
+	Sprite& set_size(glm::vec2 size);
+	Sprite& set_uv_index(std::size_t index);
+	Sprite& set_sheet(Ptr<Sheet const> sheet);
 
 	Quad const& quad() const { return m_quad; }
 	vf::DrawInstance& instance() { return m_quad.instance(); }
@@ -28,13 +28,13 @@ class Sprite {
 
 class Sprite::Sheet {
   public:
-	Sheet& setTexture(vf::Texture texture);
+	Sheet& set_texture(vf::Texture texture);
 	vf::Texture const& texture() const { return m_texture; }
 
-	std::size_t addUv(vf::UvRect uv);
+	std::size_t add_uv(vf::UvRect uv);
 	vf::UvRect const& uv(std::size_t index) const;
 
-	Sheet& setUvs(std::size_t rows = 1, std::size_t columns = 1, glm::uvec2 pad = {});
+	Sheet& set_uvs(std::size_t rows = 1, std::size_t columns = 1, glm::uvec2 pad = {});
 
   private:
 	vf::Texture m_texture{};

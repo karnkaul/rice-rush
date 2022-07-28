@@ -39,7 +39,7 @@ constexpr glm::vec2 clamp(glm::vec2 in, vf::Rect const& playArea, glm::vec2 cons
 void Player::translate(glm::vec2 xy) {
 	auto& pos = sprite.instance().transform.position;
 	pos += xy;
-	trigger.centre = pos = clamp(pos, game()->layout.playArea, sprite.quad().size() * 0.5f);
+	trigger.centre = pos = clamp(pos, game()->layout.play_area, sprite.quad().size() * 0.5f);
 }
 
 void Player::collect(std::uint32_t points, bool incrementMultiplier) {
@@ -57,7 +57,7 @@ void Player::hit() {
 }
 
 void Player::heal(int hp) {
-	m_state.health.hp = std::min(m_state.health.hp + hp, maxHp);
+	m_state.health.hp = std::min(m_state.health.hp + hp, max_hp);
 	logger::info("[Player] heal: {}; hp: {}", hp, m_state.health.hp);
 }
 

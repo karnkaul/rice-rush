@@ -4,5 +4,5 @@
 namespace rr {
 Layout const& GameObject::layout() const { return m_game->layout; }
 Basis const& GameObject::basis() const { return layout().basis; }
-float GameObject::timeScale() const { return m_game->timeScale; }
+float GameObject::time_scale() const { return m_game->time_scale; }
 } // namespace rr

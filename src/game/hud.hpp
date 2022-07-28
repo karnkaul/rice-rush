@@ -6,11 +6,11 @@
 namespace rr {
 class Hud final : public GameObject {
   public:
-	vf::Time hurtPulse{0.2s};
-	float healthIconSize{25.0f};
-	float healthLostScale{0.75f};
-	std::uint8_t healthLostAlpha{0x55};
-	vf::Rgba bgColour{vf::Rgba::make(0x504011ff)};
+	vf::Time hurt_pulse{0.2s};
+	float health_icon_size{25.0f};
+	float health_lost_scale{0.75f};
+	std::uint8_t health_lost_alpha{0x55};
+	vf::Rgba bg_tint{vf::Rgba::make(0x504011ff)};
 
   private:
 	void setup() override;
@@ -22,7 +22,7 @@ class Hud final : public GameObject {
 	vf::Text m_score{};
 	vf::Text m_debug{};
 
-	vf::Time m_hurtElapsed{};
-	bool m_hurtPulseUp{};
+	vf::Time m_hurt_elapsed{};
+	bool m_hurt_pulse_up{};
 };
 } // namespace rr

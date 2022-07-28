@@ -26,12 +26,12 @@ class GameObject {
 	virtual void setup() {}
 	virtual void tick(DeltaTime dt) = 0;
 	virtual void draw(vf::Frame const& frame) const { sprite.draw(frame); }
-	virtual void addTriggers(std::vector<Ptr<Trigger const>>&) const {}
+	virtual void add_triggers(std::vector<Ptr<Trigger const>>&) const {}
 
 	Ptr<Game> game() const { return m_game; }
 	Layout const& layout() const;
 	Basis const& basis() const;
-	float timeScale() const;
+	float time_scale() const;
 
   private:
 	friend class Game;

@@ -9,8 +9,8 @@ namespace rr {
 class Context;
 
 namespace util {
-std::string formatElapsed(vf::Time elapsed);
+std::string format_elapsed(vf::Time elapsed);
 
-vf::Texture makeTexture(Context const& context, std::string_view uri);
+vf::Texture make_texture(Context const& context, std::string_view uri);
 } // namespace util
 } // namespace rr

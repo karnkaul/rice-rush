@@ -13,9 +13,9 @@
 #include <util/util.hpp>
 
 namespace {
-std::optional<rr::Context> makeContext(int argc, char const* const argv[]) {
+std::optional<rr::Context> make_context(int argc, char const* const argv[]) {
 	auto env = rr::Env::make(argc, argv);
-	auto config = rr::Config::Scoped(rr::exePath(env, "config.txt"));
+	auto config = rr::Config::Scoped(rr::exe_path(env, "config.txt"));
 	auto builder = vf::Builder{};
 	builder.setExtent(config.config.extent).setAntiAliasing(config.config.antiAliasing);
 	// builder.setExtent({1920, 1080});
@@ -24,11 +24,11 @@ std::optional<rr::Context> makeContext(int argc, char const* const argv[]) {
 		logger::error("Failed to create vulkify instance");
 		return {};
 	}
-	auto ret = rr::Context{.env = std::move(env), .vfContext = std::move(*vf)};
-	ret.capoInstance = ktl::make_unique<capo::Instance>();
+	auto ret = rr::Context{.env = std::move(env), .vf_context = std::move(*vf)};
+	ret.capo_instance = ktl::make_unique<capo::Instance>();
 	ret.config = std::move(config);
-	ret.basis.scale = ret.basisScale(ret.vfContext.framebufferExtent());
-	ret.audio = *ret.capoInstance;
+	ret.basis.scale = ret.basis_scale(ret.vf_context.framebufferExtent());
+	ret.audio = *ret.capo_instance;
 	return ret;
 }
 
@@ -44,47 +44,39 @@ struct OneUp : rr::Consumable {
 	void consume() override { game()->player().heal(1); }
 };
 
-using rr::util::randomRange;
+using rr::util::random_range;
 
 struct DebugControls : rr::KeyListener {
 	rr::Ptr<rr::Game> game{};
 
 	void operator()(vf::KeyEvent const& key) override {
-		auto const zone = game->layout.playArea.extent * 0.5f;
-		auto const offset = +game->layout.playArea.offset;
-		if (key(vf::Key::eEnter, vf::Action::ePress)) {
-			// auto cooker = game->spawn<rr::Cooker>(randomRange(-zone, zone));
-			// cooker->text = vf::Text(game->context.vfContext, "cooker");
-			// cooker->text.setFont(&game->resources().fonts.main);
-			// cooker->text.setHeight(40);
-			game->cookerPool()->spawn({randomRange(-zone, zone) + offset, vf::Time(randomRange(2.0f, 5.0f))});
-		}
+		auto const zone = game->layout.play_area.extent * 0.5f;
+		auto const offset = +game->layout.play_area.offset;
+		if (key(vf::Key::eEnter, vf::Action::ePress)) { game->cooker_pool()->spawn({random_range(-zone, zone) + offset, vf::Time(random_range(2.0f, 5.0f))}); }
 		if (key(vf::Key::eBackslash, vf::Action::ePress)) {
-			auto consumable = game->spawn<OneUp>(randomRange(-zone, zone) + offset);
-			consumable->sprite.setSize({50.0f, 50.0f});
+			auto consumable = game->spawn<OneUp>(random_range(-zone, zone) + offset);
+			consumable->sprite.set_size({50.0f, 50.0f});
 			consumable->trigger.diameter = 75.0f;
 		}
-		if (key(vf::Key::eW, vf::Action::eRelease, vf::Mod::eCtrl)) { game->context.vfContext.close(); }
+		if (key(vf::Key::eW, vf::Action::eRelease, vf::Mod::eCtrl)) { game->context.vf_context.close(); }
 		if (key(vf::Key::eP, vf::Action::eRelease, vf::Mod::eCtrl)) {
-			auto const vsync = game->context.vfContext.vsync() == vf::VSync::eOff ? vf::VSync::eOn : vf::VSync::eOff;
-			game->context.vfContext.setVSync(vsync);
+			auto const vsync = game->context.vf_context.vsync() == vf::VSync::eOff ? vf::VSync::eOn : vf::VSync::eOff;
+			game->context.vf_context.setVSync(vsync);
 		}
 	}
 };
 
-void loadResources(rr::Game& out) {
+void load_resources(rr::Game& out) {
 	auto loader = rr::Resources::Loader{out.context};
 	loader(out.resources().fonts.main, "fonts/main.ttf");
 	loader(out.resources().textures.background, "textures/tilesf5.jpg");
 }
 
 void run(rr::Context context) {
-	// world.background()->open("textures/background.png");
-
 	auto game = rr::Game{context};
-	game.audio().setSfxGain(0.2f);
-	loadResources(game);
-	game.background()->setTexture(game.resources().textures.background);
+	game.audio().set_sfx_gain(0.2f);
+	load_resources(game);
+	game.background()->set_texture(game.resources().textures.background);
 	auto debug = DebugControls{};
 	debug.game = &game;
 
@@ -94,15 +86,15 @@ void run(rr::Context context) {
 	}
 
 	auto sheet = rr::Sprite::Sheet{};
-	auto tex = rr::util::makeTexture(context, "textures/awesomeface.png");
+	auto tex = rr::util::make_texture(context, "textures/awesomeface.png");
 
-	sheet.setTexture(std::move(tex)).setUvs(2, 1);
-	game.player().sprite.setSheet(&sheet).setUvIndex(1);
+	sheet.set_texture(std::move(tex)).set_uvs(2, 1);
+	game.player().sprite.set_sheet(&sheet).set_uv_index(1);
 	game.set(rr::Game::State::ePlay);
 
-	context.vfContext.show();
-	while (!context.vfContext.closing()) {
-		auto frame = context.vfContext.frame();
+	context.vf_context.show();
+	while (!context.vf_context.closing()) {
+		auto frame = context.vf_context.frame();
 		auto const& queue = frame.poll();
 		game.handle(queue.events);
 		game.tick(frame.dt());
@@ -112,7 +104,7 @@ void run(rr::Context context) {
 } // namespace
 
 int main(int argc, char* argv[]) {
-	auto context = makeContext(argc, argv);
+	auto context = make_context(argc, argv);
 	if (!context) { return EXIT_FAILURE; }
 	run(std::move(*context));
 }

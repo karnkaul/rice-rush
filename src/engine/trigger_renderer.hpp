@@ -17,7 +17,7 @@ class TriggerRenderer {
 	void render(std::span<Ptr<Trigger const> const> triggers, vf::Frame const& frame);
 
   private:
-	std::span<vf::CircleShape> makeGroup(std::size_t count);
+	std::span<vf::CircleShape> make_group(std::size_t count);
 
 	std::vector<vf::CircleShape> m_circles{};
 	Ptr<Context> m_context{};

@@ -39,7 +39,7 @@ class Game {
 	enum class State { eIdle, ePlay, eOver };
 
 	Layout layout{};
-	float timeScale{1.0f};
+	float time_scale{1.0f};
 	Flags flags{};
 	Context& context;
 
@@ -63,7 +63,7 @@ class Game {
 	Resources& resources() const;
 	Audio& audio() const;
 	Player& player() const { return *m_player; }
-	Ptr<CookerPool> cookerPool() const { return m_cookerPool; }
+	Ptr<CookerPool> cooker_pool() const { return m_cooker_pool; }
 	Ptr<Background> background() const { return m_background.get(); }
 
 	vf::Time elapsed() const { return m_state.elapsed; }
@@ -77,13 +77,13 @@ class Game {
 	State state() const { return m_state.state; }
 
   private:
-	void onKey(vf::KeyEvent const& key);
+	void on_key(vf::KeyEvent const& key);
 	void setup(GameObject& go, glm::vec2 position);
 	template <typename T>
 	static void tick(std::vector<ktl::kunique_ptr<T>>& vec, DeltaTime dt);
 	static void tick(GameObject& go, DeltaTime dt);
-	static void addTriggers(std::vector<Ptr<Trigger const>>& out, GameObject const& obj);
-	void transferSpawned();
+	static void add_triggers(std::vector<Ptr<Trigger const>>& out, GameObject const& obj);
+	void transfer_spawned();
 
 	struct AddToDrawList;
 	struct Impl;
@@ -97,7 +97,7 @@ class Game {
 	} m_state{};
 	ktl::kunique_ptr<Player> m_player{};
 	ktl::kunique_ptr<Background> m_background{};
-	Ptr<CookerPool> m_cookerPool{};
+	Ptr<CookerPool> m_cooker_pool{};
 	Ptr<Hud> m_hud{};
 	Framerate m_framerate{};
 };

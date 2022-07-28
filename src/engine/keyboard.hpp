@@ -6,7 +6,7 @@
 namespace rr {
 class Keyboard {
   public:
-	void onKey(vf::KeyEvent const& key) { m_pressed[key.key] = key.action != vf::Action::eRelease; }
+	void on_key(vf::KeyEvent const& key) { m_pressed[key.key] = key.action != vf::Action::eRelease; }
 
 	bool pressed(vf::Key const key) const {
 		if (auto it = m_pressed.find(key); it != m_pressed.end()) { return it->second; }

@@ -23,20 +23,20 @@ class Collection {
 
 	Type& next() {
 		assert(!m_vec.empty());
-		m_index = nextIndex();
+		m_index = next_index();
 		return get();
 	}
 
 	Type& random() {
 		assert(!m_vec.empty());
-		m_index = randomIndex();
+		m_index = random_index();
 		return get();
 	}
 
   private:
-	std::size_t nextIndex() const { return (m_index + 1) % m_vec.size(); }
+	std::size_t next_index() const { return (m_index + 1) % m_vec.size(); }
 
-	std::size_t randomIndex() const {
+	std::size_t random_index() const {
 		static auto eng = std::default_random_engine(std::random_device{}());
 		return m_vec.size() == 1 ? 0 : std::uniform_int_distribution<std::size_t>(0, m_vec.size() - 1)(eng);
 	}

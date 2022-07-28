@@ -5,10 +5,10 @@
 namespace rr {
 void Explode::tick(DeltaTime dt) {
 	m_elapsed += dt.scaled;
-	game()->timeScale = timeScale;
+	game()->time_scale = timeScale;
 	if (m_elapsed >= force.duration) {
 		destroy();
-		game()->timeScale = 1.0f;
+		game()->time_scale = 1.0f;
 		return;
 	}
 

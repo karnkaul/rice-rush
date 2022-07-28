@@ -4,12 +4,12 @@
 namespace logger {
 enum class Pipe { StdOut, StdErr };
 
-std::string logString(std::string_view text);
-void doPrint(Pipe pipe, char level, char const* text);
+std::string log_string(std::string_view text);
+void do_print(Pipe pipe, char level, char const* text);
 
 template <typename... Args>
 void print(Pipe pipe, char level, std::string_view const fmt, Args const&... args) {
-	doPrint(pipe, level, logString(ktl::kformat(fmt, args...)).c_str());
+	do_print(pipe, level, log_string(ktl::kformat(fmt, args...)).c_str());
 }
 
 template <typename... Args>

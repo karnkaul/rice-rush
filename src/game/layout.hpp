@@ -5,9 +5,9 @@
 namespace rr {
 struct Layout {
 	Basis basis{};
-	vf::Rect playArea{};
+	vf::Rect play_area{};
 	vf::Rect hud{};
-	float nPadY{0.1f};
+	float n_pad_y{0.1f};
 };
 
 namespace layers {

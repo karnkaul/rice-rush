@@ -4,19 +4,19 @@
 
 namespace rr {
 Quad::Quad(Context const& context, Info const& info, std::string name)
-	: m_mesh(vf::Mesh::makeQuad(context.vfContext, std::move(name), info.createInfo, info.texture)), m_info(info) {}
+	: m_mesh(vf::Mesh::makeQuad(context.vf_context, std::move(name), info.createInfo, info.texture)), m_info(info) {}
 
-Quad& Quad::setSize(glm::vec2 size) {
+Quad& Quad::set_size(glm::vec2 size) {
 	m_info.createInfo.size = size;
 	return refresh();
 }
 
-Quad& Quad::setUv(vf::UvRect uv) {
+Quad& Quad::set_uv(vf::UvRect uv) {
 	m_info.createInfo.uv = uv;
 	return refresh();
 }
 
-Quad& Quad::setTexture(vf::TextureHandle const& texture) {
+Quad& Quad::set_texture(vf::TextureHandle const& texture) {
 	m_mesh.texture = texture;
 	return *this;
 }

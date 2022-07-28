@@ -10,6 +10,6 @@ class Pawn : public GameObject {
 	Trigger trigger{};
 
   private:
-	void addTriggers(std::vector<Ptr<Trigger const>>& out) const override { out.push_back(&trigger); }
+	void add_triggers(std::vector<Ptr<Trigger const>>& out) const override { out.push_back(&trigger); }
 };
 } // namespace rr

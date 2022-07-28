@@ -13,10 +13,10 @@ class Player : public GameObject {
 	std::string name{};
 	Trigger trigger{};
 	float speed{500.0f};
-	int maxHp{3};
+	int max_hp{3};
 
 	void translate(glm::vec2 xy);
-	void collect(std::uint32_t points, bool incrementMultiplier = true);
+	void collect(std::uint32_t points, bool increment_multiplier = true);
 	void hit();
 	void heal(int hp);
 	bool interact() const { return m_state.interact; }
