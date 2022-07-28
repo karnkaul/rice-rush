@@ -10,6 +10,7 @@
 #include <util/collection.hpp>
 #include <util/logger.hpp>
 #include <util/random.hpp>
+#include <util/sequenced_index.hpp>
 #include <util/util.hpp>
 
 namespace {
@@ -86,26 +87,21 @@ void run(rr::Context context) {
 		game.flags.set(rr::Game::Flag::eRenderTriggers);
 	}
 
-	auto player_tex = rr::util::make_texture(context, "textures/player/1.png");
-	auto player_sheet = rr::Sprite::Sheet{};
-	player_sheet.set_texture(std::move(player_tex)).set_uvs(1, 6);
+	auto player_sheet = rr::Sprite::Sheet{rr::util::make_texture(context, "textures/player/1.png")};
+	player_sheet.set_uvs(1, 6);
 
-	auto cooker_tex = rr::util::make_texture(context, "textures/cooker.png");
-	auto cooker_sheet = rr::Sprite::Sheet{};
-	cooker_sheet.set_texture(std::move(cooker_tex));
+	auto cooker_sheet = rr::Sprite::Sheet{rr::util::make_texture(context, "textures/cooker.png")};
 
 	game.set(rr::Game::State::ePlay);
 	auto const player_size = game.layout.basis.scale * glm::vec2{150.0f};
 	game.player().sprite.set_sheet(&player_sheet).set_size(player_size);
+	auto seq = rr::SequencedIndex::Sequence{};
+	seq.indices = rr::make_sequence_indices(player_sheet.uv_count());
+	seq.duration = std::chrono::milliseconds(300);
+	game.player().run_anim.set(std::move(seq));
 	auto const cooker_size = game.layout.basis.scale * glm::vec2{75.0f};
 	game.cooker_pool()->sprite.set_sheet(&cooker_sheet).set_size(cooker_size);
 
-	auto elapsed = vf::Time{};
-	auto next_index = [total = player_sheet.uv_count()] {
-		static std::size_t ret{};
-		ret = (ret + 1) % total;
-		return ret;
-	};
 	context.vf_context.show();
 	while (!context.vf_context.closing()) {
 		auto frame = context.vf_context.frame();
@@ -113,12 +109,6 @@ void run(rr::Context context) {
 		game.handle(queue.events);
 		game.tick(frame.dt());
 		game.render(frame);
-
-		elapsed += frame.dt();
-		if (elapsed >= std::chrono::milliseconds(50)) {
-			elapsed = {};
-			game.player().sprite.set_uv_index(next_index());
-		}
 	}
 }
 } // namespace

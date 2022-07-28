@@ -3,6 +3,7 @@
 #include <game/controller.hpp>
 #include <game/game_object.hpp>
 #include <game/health.hpp>
+#include <util/sequenced_index.hpp>
 
 namespace rr {
 class Pawn;
@@ -11,6 +12,7 @@ class Player : public GameObject {
   public:
 	Controller controller{};
 	std::string name{};
+	SequencedIndex run_anim{};
 	Trigger trigger{};
 	float speed{500.0f};
 	int max_hp{3};

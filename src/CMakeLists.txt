@@ -46,6 +46,8 @@ target_sources(${PROJECT_NAME} PRIVATE
   util/logger.hpp
   util/ptr.hpp
   util/random.hpp
+  util/sequenced_index.cpp
+  util/sequenced_index.hpp
   util/util.cpp
   util/util.hpp
 

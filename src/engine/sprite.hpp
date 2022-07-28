@@ -7,6 +7,7 @@ namespace rr {
 class Sprite {
   public:
 	class Sheet;
+	struct Sequence;
 
 	Sprite() = default;
 	explicit Sprite(Context const& context, std::string name = "sprite");
@@ -29,6 +30,9 @@ class Sprite {
 
 class Sprite::Sheet {
   public:
+	Sheet() = default;
+	Sheet(vf::Texture texture) { set_texture(std::move(texture)); }
+
 	Sheet& set_texture(vf::Texture texture);
 	vf::Texture const& texture() const { return m_texture; }
 

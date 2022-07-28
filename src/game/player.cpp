@@ -69,6 +69,8 @@ void Player::reset(glm::vec2 const position) {
 
 void Player::tick(DeltaTime dt) {
 	m_state.health.tick(dt.scaled);
+	run_anim.tick(dt.scaled);
+	sprite.set_uv_index(run_anim.index());
 
 	auto const cs = controller.update(game()->keyboard());
 	translate(cs.xy * speed * basis().scale * dt.scaled.count());
