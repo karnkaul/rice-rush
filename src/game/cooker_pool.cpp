@@ -17,9 +17,11 @@ void CookerPool::spawn(Cooker const& cooker) {
 
 	entry.sprite = Sprite(game()->context, "cooker");
 	entry.sprite.instance().transform.position = entry.trigger.centre;
+	entry.sprite.set_sheet(sprite.sheet());
+	entry.sprite.set_size(sprite.quad().size());
 
 	entry.text = vf::Text(game()->context.vf_context, "cooker");
-	entry.text.setFont(&game()->resources().fonts.main).setHeight(textHeight).setString(util::format_elapsed(cooker.cook));
+	entry.text.setFont(&game()->resources.fonts.main).setHeight(textHeight).setString(util::format_elapsed(cooker.cook));
 	entry.text.transform().position = entry.trigger.centre;
 	entry.text.transform().position.y += 100.0f * basis().scale;
 

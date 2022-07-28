@@ -42,8 +42,9 @@ class Game {
 	float time_scale{1.0f};
 	Flags flags{};
 	Context& context;
+	Resources& resources;
 
-	Game(Context& context);
+	Game(Context& context, Resources& resources);
 
 	Game& operator=(Game&&) = delete;
 
@@ -60,7 +61,6 @@ class Game {
 	}
 
 	Keyboard const& keyboard() const;
-	Resources& resources() const;
 	Audio& audio() const;
 	Player& player() const { return *m_player; }
 	Ptr<CookerPool> cooker_pool() const { return m_cooker_pool; }

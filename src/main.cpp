@@ -66,17 +66,18 @@ struct DebugControls : rr::KeyListener {
 	}
 };
 
-void load_resources(rr::Game& out) {
-	auto loader = rr::Resources::Loader{out.context};
-	loader(out.resources().fonts.main, "fonts/main.ttf");
-	loader(out.resources().textures.background, "textures/tilesf5.jpg");
+rr::Resources load_resources(rr::Context& context) {
+	auto loader = rr::Resources::Loader{context};
+	auto ret = rr::Resources{};
+	loader(ret.fonts.main, "fonts/main.ttf");
+	loader(ret.textures.background, "textures/tilesf5.jpg");
+	return ret;
 }
 
 void run(rr::Context context) {
-	auto game = rr::Game{context};
+	auto resources = load_resources(context);
+	auto game = rr::Game{context, resources};
 	game.audio().set_sfx_gain(0.2f);
-	load_resources(game);
-	game.background()->set_texture(game.resources().textures.background);
 	auto debug = DebugControls{};
 	debug.game = &game;
 
@@ -85,13 +86,26 @@ void run(rr::Context context) {
 		game.flags.set(rr::Game::Flag::eRenderTriggers);
 	}
 
-	auto sheet = rr::Sprite::Sheet{};
-	auto tex = rr::util::make_texture(context, "textures/awesomeface.png");
+	auto player_tex = rr::util::make_texture(context, "textures/player/1.png");
+	auto player_sheet = rr::Sprite::Sheet{};
+	player_sheet.set_texture(std::move(player_tex)).set_uvs(1, 6);
 
-	sheet.set_texture(std::move(tex)).set_uvs(2, 1);
-	game.player().sprite.set_sheet(&sheet).set_uv_index(1);
+	auto cooker_tex = rr::util::make_texture(context, "textures/cooker.png");
+	auto cooker_sheet = rr::Sprite::Sheet{};
+	cooker_sheet.set_texture(std::move(cooker_tex));
+
 	game.set(rr::Game::State::ePlay);
+	auto const player_size = game.layout.basis.scale * glm::vec2{150.0f};
+	game.player().sprite.set_sheet(&player_sheet).set_size(player_size);
+	auto const cooker_size = game.layout.basis.scale * glm::vec2{75.0f};
+	game.cooker_pool()->sprite.set_sheet(&cooker_sheet).set_size(cooker_size);
 
+	auto elapsed = vf::Time{};
+	auto next_index = [total = player_sheet.uv_count()] {
+		static std::size_t ret{};
+		ret = (ret + 1) % total;
+		return ret;
+	};
 	context.vf_context.show();
 	while (!context.vf_context.closing()) {
 		auto frame = context.vf_context.frame();
@@ -99,6 +113,12 @@ void run(rr::Context context) {
 		game.handle(queue.events);
 		game.tick(frame.dt());
 		game.render(frame);
+
+		elapsed += frame.dt();
+		if (elapsed >= std::chrono::milliseconds(50)) {
+			elapsed = {};
+			game.player().sprite.set_uv_index(next_index());
+		}
 	}
 }
 } // namespace

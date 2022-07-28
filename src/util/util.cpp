@@ -27,7 +27,7 @@ std::string util::format_elapsed(vf::Time elapsed) {
 
 vf::Texture util::make_texture(Context const& context, std::string_view uri) {
 	auto image = vf::Image{};
-	if (!image.load(rr::data_path(context.env, "textures/awesomeface.png").c_str())) {
+	if (!image.load(rr::data_path(context.env, uri).c_str())) {
 		logger::error("[Resources] Failed to load Image [{}]", uri);
 		return {};
 	}

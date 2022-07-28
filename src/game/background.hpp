@@ -5,21 +5,17 @@
 #include <vulkify/graphics/resources/texture.hpp>
 
 namespace rr {
-class Game;
 struct Layout;
 
 class Background {
   public:
-	Background(Game& game);
+	Background(vf::Context const& vf_context);
 
-	void set_texture(vf::Texture const& texture, std::uint32_t columns = 8);
+	void set_texture(vf::Texture const& texture, Layout const& layout, std::uint32_t columns = 8);
 	void draw(vf::Frame const& frame) const;
 
   private:
-	Ptr<Game> game() const { return m_game; }
-	Layout const& layout() const;
-
-	Ptr<Game> m_game{};
 	vf::Mesh m_mesh{};
+	Ptr<vf::Context const> m_vf_context{};
 };
 } // namespace rr

@@ -12,7 +12,7 @@ void Hud::setup() {
 	m_health = {vfc, "health"};
 	m_score = {vfc, "score"};
 
-	auto& resources = game()->resources();
+	auto& resources = game()->resources;
 	auto& hud = layout().hud;
 
 	m_background = vf::Mesh(vfc, "hud_background");

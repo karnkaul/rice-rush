@@ -72,6 +72,13 @@ void Player::tick(DeltaTime dt) {
 
 	auto const cs = controller.update(game()->keyboard());
 	translate(cs.xy * speed * basis().scale * dt.scaled.count());
+	if (std::abs(cs.xy.x) > 0.01f) {
+		if (cs.xy.x < 0.0f) {
+			sprite.instance().transform.scale.x = -1.0f;
+		} else {
+			sprite.instance().transform.scale.x = 1.0f;
+		}
+	}
 
 	m_state.interact = cs.flags.test(Controller::Flag::eInteract);
 }

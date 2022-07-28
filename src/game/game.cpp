@@ -37,7 +37,7 @@ struct Game::AddToDrawList {
 	}
 };
 
-Game::Game(Context& context) : context(context), m_impl(ktl::make_unique<Impl>(context)) {
+Game::Game(Context& context, Resources& resources) : context(context), resources(resources), m_impl(ktl::make_unique<Impl>(context)) {
 	layout.basis = context.basis;
 	layout.play_area.extent = layout.basis.scale * layout.basis.space;
 	layout.play_area.extent.y *= (1.0f - layout.n_pad_y);
@@ -49,7 +49,8 @@ Game::Game(Context& context) : context(context), m_impl(ktl::make_unique<Impl>(c
 	setup(*m_player, layout.play_area.offset);
 	m_player->name = context.config.config.playerName;
 
-	m_background = ktl::make_unique<Background>(*this);
+	m_background = ktl::make_unique<Background>(context.vf_context);
+	m_background->set_texture(resources.textures.background, layout);
 }
 
 void Game::attach(Ptr<KeyListener> listener) {
@@ -61,7 +62,6 @@ void Game::attach(Ptr<KeyListener> listener) {
 void Game::detach(Ptr<KeyListener> listener) { std::erase(m_impl->listeners, listener); }
 
 Keyboard const& Game::keyboard() const { return m_impl->keyboard; }
-Resources& Game::resources() const { return m_impl->resources; }
 Audio& Game::audio() const { return m_impl->audio; }
 
 void Game::handle(std::span<vf::Event const> events) {
