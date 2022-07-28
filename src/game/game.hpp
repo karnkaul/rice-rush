@@ -21,6 +21,7 @@ class Player;
 class Pawn;
 class CookerPool;
 class Hud;
+class Background;
 
 class Game;
 
@@ -63,6 +64,8 @@ class Game {
 	Audio& audio() const;
 	Player& player() const { return *m_player; }
 	Ptr<CookerPool> cookerPool() const { return m_cookerPool; }
+	Ptr<Background> background() const { return m_background.get(); }
+
 	vf::Time elapsed() const { return m_state.elapsed; }
 	Framerate const& framerate() const { return m_framerate; }
 
@@ -93,6 +96,7 @@ class Game {
 		vf::Time elapsed{};
 	} m_state{};
 	ktl::kunique_ptr<Player> m_player{};
+	ktl::kunique_ptr<Background> m_background{};
 	Ptr<CookerPool> m_cookerPool{};
 	Ptr<Hud> m_hud{};
 	Framerate m_framerate{};

@@ -1,6 +1,7 @@
 #include <engine/config.hpp>
 #include <engine/context.hpp>
 #include <engine/env.hpp>
+#include <game/background.hpp>
 #include <game/consumable.hpp>
 #include <game/cooker_pool.hpp>
 #include <game/game.hpp>
@@ -85,6 +86,7 @@ struct DebugControls : rr::KeyListener {
 void loadResources(rr::Game& out) {
 	auto loader = rr::Resources::Loader{out.context};
 	loader(out.resources().fonts.main, "fonts/main.ttf");
+	loader(out.resources().textures.background, "textures/tilesf5.jpg");
 }
 
 void run(rr::Context context) {
@@ -93,6 +95,7 @@ void run(rr::Context context) {
 	auto game = rr::Game{context};
 	game.audio().setSfxGain(0.2f);
 	loadResources(game);
+	game.background()->setTexture(game.resources().textures.background);
 	auto debug = DebugControls{};
 	debug.game = &game;
 

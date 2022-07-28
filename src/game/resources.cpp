@@ -11,4 +11,25 @@ void Resources::Loader::operator()(vf::Ttf& out, std::string_view uri) const {
 		logger::warn("[Resources] Failed to load Ttf [{}]", uri);
 	}
 }
+
+void Resources::Loader::operator()(vf::Texture& out, std::string_view uri, Ptr<vf::TextureCreateInfo const> info) const {
+	auto image = vf::Image{};
+	if (!image.load(dataPath(context.env, uri).c_str())) {
+		logger::warn("[Resources] Failed to open image [{}]", uri);
+		return;
+	}
+	if (!out || info) {
+		auto tci = info ? *info : vf::TextureCreateInfo{};
+		out = vf::Texture(context.vfContext, std::string(uri), image, tci);
+		if (!out) {
+			logger::warn("[Resources] Failed to create Texture [{}]", uri);
+			return;
+		}
+	}
+	if (!out.create(image)) {
+		logger::warn("[Resources] Failed to create Texture [{}]", uri);
+		return;
+	}
+	logger::info("[Resources] Texture [{}] loaded", uri);
+}
 } // namespace rr

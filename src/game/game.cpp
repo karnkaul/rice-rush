@@ -1,6 +1,7 @@
 #include <engine/audio.hpp>
 #include <engine/context.hpp>
 #include <engine/trigger_renderer.hpp>
+#include <game/background.hpp>
 #include <game/cooker_pool.hpp>
 #include <game/game.hpp>
 #include <game/hud.hpp>
@@ -47,6 +48,9 @@ Game::Game(Context& context) : context(context), m_impl(ktl::make_unique<Impl>(c
 	m_player = ktl::make_unique<Player>();
 	setup(*m_player, layout.playArea.offset);
 	m_player->name = context.config.config.playerName;
+
+	m_background = ktl::make_unique<Background>();
+	setup(*m_background, {});
 }
 
 void Game::attach(Ptr<KeyListener> listener) {
@@ -83,6 +87,7 @@ void Game::tick(vf::Time dt) {
 }
 
 void Game::render(vf::Frame const& frame) const {
+	static_cast<GameObject*>(m_background.get())->draw(frame);
 	if (flags.test(Flag::eRenderTriggers)) {
 		m_impl->triggers.clear();
 		m_impl->triggers.push_back(&m_player->trigger);

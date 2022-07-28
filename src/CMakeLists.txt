@@ -18,6 +18,8 @@ target_sources(${PROJECT_NAME} PRIVATE
   engine/trigger_renderer.hpp
   engine/trigger.hpp
 
+  game/background.cpp
+  game/background.hpp
   game/consumable.cpp
   game/consumable.hpp
   game/controller.cpp
