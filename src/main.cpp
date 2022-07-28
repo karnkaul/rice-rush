@@ -100,7 +100,7 @@ void run(rr::Context context) {
 	seq.duration = std::chrono::milliseconds(300);
 	game.player().run_anim.set(std::move(seq));
 	auto const cooker_size = game.layout.basis.scale * glm::vec2{75.0f};
-	game.cooker_pool()->sprite.set_sheet(&cooker_sheet).set_size(cooker_size);
+	game.cooker_pool()->set_prefab({.size = cooker_size, .texture = cooker_sheet.texture().handle()});
 
 	context.vf_context.show();
 	while (!context.vf_context.closing()) {

@@ -1,4 +1,5 @@
 #pragma once
+#include <engine/instanced.hpp>
 #include <engine/trigger.hpp>
 #include <game/game_object.hpp>
 #include <vulkify/graphics/primitives/text.hpp>
@@ -15,6 +16,12 @@ class CookerPool : public GameObject {
 		Points points{10};
 	};
 
+	struct Prefab {
+		glm::vec2 size{100.0f};
+		vf::TextureHandle texture{};
+	};
+
+	void set_prefab(Prefab prefab);
 	void spawn(Cooker const& cooker);
 
 	vf::Text::Height textHeight{30};
@@ -23,7 +30,6 @@ class CookerPool : public GameObject {
 
   private:
 	struct Entry {
-		Sprite sprite{};
 		vf::Text text{};
 
 		Trigger trigger{};
@@ -31,14 +37,15 @@ class CookerPool : public GameObject {
 		vf::Time vibrateRemain{};
 	};
 
+	void setup() override;
 	void tick(DeltaTime dt) override;
 	void draw(vf::Frame const& frame) const override;
 	void add_triggers(std::vector<Ptr<Trigger const>>& out) const override;
 
-	Ptr<Entry> update_and_get_nearest(Trigger& player, vf::Time dt);
+	Ptr<Instanced<Entry>::Entry> update_and_get_nearest(Trigger& player, vf::Time dt);
 	void spawn_collect(glm::vec2 position) const;
-	void pop(Entry& entry);
+	void pop(Instanced<Entry>::Entry& entry);
 
-	std::vector<Entry> m_entries{};
+	Instanced<Entry> m_entries{};
 };
 } // namespace rr
