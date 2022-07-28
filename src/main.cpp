@@ -9,6 +9,7 @@
 #include <game/resources.hpp>
 #include <util/collection.hpp>
 #include <util/logger.hpp>
+#include <util/random.hpp>
 #include <util/util.hpp>
 
 namespace {
@@ -31,20 +32,6 @@ std::optional<rr::Context> makeContext(int argc, char const* const argv[]) {
 	return ret;
 }
 
-std::default_random_engine& randomEngine() {
-	static auto eng = std::default_random_engine(std::random_device{}());
-	return eng;
-}
-
-[[maybe_unused]] float randomRange(float min, float max) { return std::uniform_real_distribution<float>(min, max)(randomEngine()); }
-
-template <std::integral T>
-[[maybe_unused]] T randomRange(T min, T max) {
-	return std::uniform_int_distribution<T>(min, max)(randomEngine());
-}
-
-[[maybe_unused]] glm::vec2 randomRange(glm::vec2 min, glm::vec2 max) { return {randomRange(min.x, max.x), randomRange(min.y, max.y)}; }
-
 // template <typename T>
 // [[maybe_unused]] void loadAllFrom(rr::World& world, rr::Collection<T>& out, std::string_view dir, std::string_view ext) {
 // 	for (auto& file : rr::fileList(world.context().env, dir, ext)) {
@@ -57,6 +44,8 @@ struct OneUp : rr::Consumable {
 	void consume() override { game()->player().heal(1); }
 };
 
+using rr::util::randomRange;
+
 struct DebugControls : rr::KeyListener {
 	rr::Ptr<rr::Game> game{};
 
@@ -68,7 +57,7 @@ struct DebugControls : rr::KeyListener {
 			// cooker->text = vf::Text(game->context.vfContext, "cooker");
 			// cooker->text.setFont(&game->resources().fonts.main);
 			// cooker->text.setHeight(40);
-			game->cookerPool()->spawn(randomRange(-zone, zone) + offset, vf::Time(randomRange(2.0f, 5.0f)));
+			game->cookerPool()->spawn({randomRange(-zone, zone) + offset, vf::Time(randomRange(2.0f, 5.0f))});
 		}
 		if (key(vf::Key::eBackslash, vf::Action::ePress)) {
 			auto consumable = game->spawn<OneUp>(randomRange(-zone, zone) + offset);

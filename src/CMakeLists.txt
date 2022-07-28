@@ -45,6 +45,7 @@ target_sources(${PROJECT_NAME} PRIVATE
   util/logger.cpp
   util/logger.hpp
   util/ptr.hpp
+  util/random.hpp
   util/util.cpp
   util/util.hpp
 
