@@ -1,23 +1,10 @@
 #include <engine/config.hpp>
 #include <util/logger.hpp>
+#include <util/property.hpp>
 #include <fstream>
 
 namespace rr {
 namespace {
-std::string trim(std::string_view str) {
-	while (!str.empty() && std::isspace(static_cast<unsigned char>(str.front()))) { str = str.substr(1); }
-	while (!str.empty() && std::isspace(static_cast<unsigned char>(str.back()))) { str = str.substr(0, str.size() - 1); }
-	return std::string(str);
-}
-
-std::pair<std::string, std::string> get_property(std::ifstream& file) {
-	auto line = std::string{};
-	std::getline(file, line);
-	auto const eq = line.find('=');
-	if (eq == std::string::npos) { return {}; }
-	return {trim(std::string_view(line.data(), eq)), trim(std::string_view(line.data() + eq + 1, line.size() - eq - 1))};
-}
-
 constexpr vf::AntiAliasing aa(std::string_view const str) {
 	if (str == "16x") { return vf::AntiAliasing::e16x; }
 	if (str == "8x") { return vf::AntiAliasing::e8x; }
@@ -53,11 +40,8 @@ Config Config::Scoped::load(const char* path) {
 	auto ret = Config{};
 	auto file = std::ifstream(path);
 	if (!file) { return ret; }
-	while (file) {
-		auto [key, value] = get_property(file);
-		if (key.empty()) { continue; }
-		populate(ret, key, std::move(value));
-	}
+	auto parser = util::Property::Parser{file};
+	parser.parse_all([&](util::Property property) { populate(ret, property.key, property.value); });
 	logger::info("[Config] loaded from [{}]", path);
 	return ret;
 }

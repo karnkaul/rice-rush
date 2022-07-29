@@ -1,5 +1,6 @@
 #include <game/game.hpp>
 #include <game/player.hpp>
+#include <game/resources.hpp>
 #include <glm/gtx/norm.hpp>
 #include <util/logger.hpp>
 
@@ -64,6 +65,8 @@ void Player::heal(int hp) {
 void Player::reset(glm::vec2 const position) {
 	logger::info("[Player] reset");
 	m_state = {};
+	auto const& anim = game()->resources.animations.player;
+	sprite.set_sheet(anim.sheet, anim.sequence).set_size(size * basis().scale);
 	sprite.instance().transform.position = trigger.centre = position;
 }
 

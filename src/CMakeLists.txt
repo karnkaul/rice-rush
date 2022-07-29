@@ -44,12 +44,14 @@ target_sources(${PROJECT_NAME} PRIVATE
   game/resources.hpp
 
   util/collection.hpp
+  util/index_timeline.cpp
+  util/index_timeline.hpp
   util/logger.cpp
   util/logger.hpp
+  util/property.cpp
+  util/property.hpp
   util/ptr.hpp
   util/random.hpp
-  util/sequenced_index.cpp
-  util/sequenced_index.hpp
   util/util.cpp
   util/util.hpp
 

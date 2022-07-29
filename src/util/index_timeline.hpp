@@ -6,7 +6,7 @@
 namespace rr {
 using namespace std::chrono_literals;
 
-class SequencedIndex {
+class IndexTimeline {
   public:
 	struct Sequence {
 		vf::Time duration{1s};
@@ -16,7 +16,7 @@ class SequencedIndex {
 		constexpr std::size_t length() const { return end - begin; }
 	};
 
-	SequencedIndex& set(Sequence sequence);
+	IndexTimeline& set(Sequence sequence);
 
 	void tick(vf::Time dt);
 	std::size_t index() const { return m_active.index; }

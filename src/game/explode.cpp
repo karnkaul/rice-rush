@@ -13,8 +13,7 @@ void Explode::tick(DeltaTime dt) {
 	}
 
 	auto& player = game()->player();
-	auto const impulse = force.impulse * (force.duration - m_elapsed).count();
 	auto const dir = glm::normalize(player.sprite.instance().transform.position - sprite.instance().transform.position);
-	player.translate(impulse * dt.scaled.count() * basis().scale * dir);
+	player.translate(force.impulse * dt.scaled.count() * basis().scale * dir);
 }
 } // namespace rr

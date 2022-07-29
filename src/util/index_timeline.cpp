@@ -1,9 +1,9 @@
-#include <util/sequenced_index.hpp>
+#include <util/index_timeline.hpp>
 #include <algorithm>
 #include <numeric>
 
 namespace rr {
-SequencedIndex& SequencedIndex::set(Sequence sequence) {
+IndexTimeline& IndexTimeline::set(Sequence sequence) {
 	m_sequence = sequence;
 	m_active.index = sequence.begin;
 	auto const length = m_sequence.length();
@@ -11,7 +11,7 @@ SequencedIndex& SequencedIndex::set(Sequence sequence) {
 	return *this;
 }
 
-void SequencedIndex::tick(vf::Time dt) {
+void IndexTimeline::tick(vf::Time dt) {
 	auto const length = m_sequence.length();
 	if (m_active.index >= length) { return; }
 	m_active.remain -= dt;

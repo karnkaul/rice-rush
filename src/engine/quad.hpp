@@ -6,7 +6,7 @@ class Frame;
 }
 
 namespace rr {
-class Context;
+struct Context;
 
 class Quad {
   public:

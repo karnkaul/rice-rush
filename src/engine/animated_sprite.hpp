@@ -1,6 +1,6 @@
 #pragma once
 #include <engine/sprite.hpp>
-#include <util/sequenced_index.hpp>
+#include <util/index_timeline.hpp>
 
 namespace rr {
 class AnimatedSprite : public Sprite {
@@ -8,9 +8,9 @@ class AnimatedSprite : public Sprite {
 	AnimatedSprite() = default;
 	AnimatedSprite(Context const& context, std::string name = "animated_sprite") : Sprite(context, std::move(name)) {}
 
-	SequencedIndex index{};
+	IndexTimeline timeline{};
 
-	AnimatedSprite& set_sheet(Sprite::Sheet const& sheet, SequencedIndex::Sequence sequence);
+	AnimatedSprite& set_sheet(Sprite::Sheet const& sheet, IndexTimeline::Sequence sequence);
 	AnimatedSprite& set_sheet(Sprite::Sheet const& sheet, vf::Time duration);
 
 	void tick(vf::Time dt);

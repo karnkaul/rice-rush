@@ -3,7 +3,6 @@
 #include <game/controller.hpp>
 #include <game/game_object.hpp>
 #include <game/health.hpp>
-#include <util/sequenced_index.hpp>
 
 namespace rr {
 class Pawn;
@@ -13,8 +12,10 @@ class Player : public GameObject {
 	Controller controller{};
 	std::string name{};
 	Trigger trigger{};
+	glm::vec2 size{150.0f};
 	float speed{500.0f};
 	int max_hp{3};
+	vf::Time anim_duration{0.3s};
 
 	void translate(glm::vec2 xy);
 	void collect(std::uint32_t points, bool increment_multiplier = true);

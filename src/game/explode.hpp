@@ -5,8 +5,8 @@ namespace rr {
 class Explode : public GameObject {
   public:
 	struct Force {
-		float impulse{200.0f};
-		vf::Time duration{1s};
+		float impulse{1000.0f};
+		vf::Time duration{0.1s};
 	};
 
 	Force force{};

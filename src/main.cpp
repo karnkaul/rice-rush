@@ -10,7 +10,6 @@
 #include <util/collection.hpp>
 #include <util/logger.hpp>
 #include <util/random.hpp>
-#include <util/sequenced_index.hpp>
 #include <util/util.hpp>
 
 namespace {
@@ -55,7 +54,10 @@ struct DebugControls : rr::KeyListener {
 	void operator()(vf::KeyEvent const& key) override {
 		auto const zone = game->layout.play_area.extent * 0.5f;
 		auto const offset = +game->layout.play_area.offset;
-		if (key(vf::Key::eEnter, vf::Action::ePress)) { game->cooker_pool()->spawn({random_range(-zone, zone) + offset, vf::Time(random_range(2.0f, 5.0f))}); }
+		if (key(vf::Key::eEnter, vf::Action::ePress)) {
+			auto const cooker_zone = 0.75f * zone;
+			game->cooker_pool()->spawn({random_range(-cooker_zone, cooker_zone) + offset, vf::Time(random_range(2.0f, 5.0f))});
+		}
 		if (key(vf::Key::eBackslash, vf::Action::ePress)) {
 			auto consumable = game->spawn<OneUp>(random_range(-zone, zone) + offset);
 			consumable->sprite.set_size({50.0f, 50.0f});
@@ -74,6 +76,7 @@ rr::Resources load_resources(rr::Context& context) {
 	auto ret = rr::Resources{};
 	loader(ret.fonts.main, "fonts/main.ttf");
 	loader(ret.textures.background, "textures/tilesf5.jpg");
+	loader(ret.animations.player, "sprite_sheets/player.sheet");
 	return ret;
 }
 
@@ -95,10 +98,8 @@ void run(rr::Context context) {
 	auto cooker_sheet = rr::Sprite::Sheet{rr::util::make_texture(context, "textures/cooker.png")};
 
 	game.set(rr::Game::State::ePlay);
-	auto const player_size = game.layout.basis.scale * glm::vec2{150.0f};
-	game.player().sprite.set_sheet(player_sheet, 0.3s).set_size(player_size);
 	auto const cooker_size = game.layout.basis.scale * glm::vec2{75.0f};
-	game.cooker_pool()->set_prefab({.size = cooker_size, .texture = cooker_sheet.texture().handle()});
+	game.cooker_pool()->set_prefab({cooker_size, cooker_sheet.texture().handle()});
 
 	context.vf_context.show();
 	while (!context.vf_context.closing()) {
