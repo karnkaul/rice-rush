@@ -1,4 +1,5 @@
 #pragma once
+#include <capo/source.hpp>
 #include <engine/instanced.hpp>
 #include <engine/trigger.hpp>
 #include <game/game_object.hpp>
@@ -53,6 +54,7 @@ class CookerPool : public GameObject {
 
 	Instanced<Entry> m_entries{};
 	Prefab m_prefab{};
+	capo::Source m_sfx{};
 	Ptr<ExplodePool> m_explode_pool{};
 };
 } // namespace rr

@@ -14,6 +14,7 @@ namespace layers {
 inline constexpr int background{-10};
 inline constexpr int player{10};
 inline constexpr int consumable{20};
+inline constexpr int vfx{30};
 inline constexpr int hud{50};
 } // namespace layers
 } // namespace rr

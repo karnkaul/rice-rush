@@ -15,8 +15,7 @@ class Audio {
 	float sfx_gain() const { return m_sfx.gain(); }
 
 	Audio& play(capo::Sound const& sound) {
-		m_sfx.bind(sound);
-		m_sfx.play();
+		m_sfx.play(sound);
 		return *this;
 	}
 

@@ -4,10 +4,10 @@ include(FetchContent)
 FetchContent_Declare(
   capo
   GIT_REPOSITORY https://github.com/capo-devs/capo
-  GIT_TAG 117ae35 # change to version tag after all bug-fixes etc
+  GIT_TAG 02375b7 # change to version tag after all bug-fixes etc
   SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/capo"
 )
-set(CAPO_BUILD_EXAMPLE OFF)
+set(CAPO_BUILD_EXAMPLE ON)
 FetchContent_MakeAvailable(capo)
 
 # vulkify

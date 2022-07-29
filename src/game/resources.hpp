@@ -31,7 +31,10 @@ struct Resources {
 	} animations{};
 
 	struct {
+		capo::Sound tick_tock{};
 		capo::Sound explode{};
+		capo::Sound collect{};
+		capo::Sound power_up{};
 	} sfx{};
 
 	struct Loader;

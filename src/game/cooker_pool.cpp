@@ -37,11 +37,19 @@ bool CookerPool::intersecting(Trigger const& trigger) const {
 void CookerPool::setup() {
 	m_entries.mesh = {game()->context.vf_context, "cookers"};
 	m_entries.mesh.gbo.write(vf::Geometry::makeQuad());
+
+	m_sfx = game()->context.capo_instance->makeSource();
+	m_sfx.loop(true);
+	m_sfx.bind(game()->resources.sfx.tick_tock);
+
 	m_explode_pool = game()->spawn<ExplodePool>();
 }
 
 void CookerPool::tick(DeltaTime dt) {
-	if (game()->state() != Game::State::ePlay) { return; }
+	if (game()->state() != Game::State::ePlay) {
+		if (m_sfx.state() == capo::State::ePlaying) { m_sfx.stop(); }
+		return;
+	}
 	auto& player = game()->player();
 	if (auto entry = update_and_get_nearest(player.trigger, dt.scaled)) {
 		if (player.interact()) {
@@ -84,12 +92,14 @@ auto CookerPool::update_and_get_nearest(Trigger& player, vf::Time dt) -> Ptr<Ins
 	};
 
 	player.interactable = false;
+	auto ticking{false};
 	for (auto& entry : m_entries.entries) {
 		entry.t.trigger.interactable = false;
 		if (player.intersecting(entry.t.trigger)) { setNearest(entry); }
 		if (entry.t.cooker.cook > 0s) {
 			entry.t.cooker.cook -= dt;
 		} else {
+			ticking = true;
 			if (entry.t.vibrateRemain <= 0s) {
 				auto const dxy = glm::vec2(5.0f) * layout().basis.scale;
 				entry.instance.transform.position = entry.t.cooker.position + util::random_range(-dxy, dxy);
@@ -100,6 +110,18 @@ auto CookerPool::update_and_get_nearest(Trigger& player, vf::Time dt) -> Ptr<Ins
 			entry.instance.tint = vf::Rgba::make(0xffffccff).linear();
 			entry.t.text.setString(util::format_elapsed(entry.t.cooker.ready));
 		}
+	}
+
+	m_sfx.gain(game()->sfx_gain() * 0.25f);
+	switch (m_sfx.state()) {
+	case capo::State::ePlaying: {
+		if (!ticking) { m_sfx.stop(); }
+		break;
+	}
+	default: {
+		if (ticking) { m_sfx.play(); }
+		break;
+	}
 	}
 
 	if (nearest.entry) { player.interactable = nearest.entry->t.trigger.interactable = true; }

@@ -65,6 +65,7 @@ class Game {
 	Player& player() const { return *m_player; }
 	Ptr<CookerPool> cooker_pool() const { return m_cooker_pool; }
 	Ptr<Background> background() const { return m_background.get(); }
+	float sfx_gain() const;
 
 	vf::Time elapsed() const { return m_state.elapsed; }
 	Framerate const& framerate() const { return m_framerate; }

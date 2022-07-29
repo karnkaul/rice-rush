@@ -1,3 +1,4 @@
+#include <engine/audio.hpp>
 #include <game/game.hpp>
 #include <game/player.hpp>
 #include <game/resources.hpp>
@@ -47,6 +48,7 @@ void Player::collect(std::uint32_t points, bool incrementMultiplier) {
 	auto const dp = points * m_state.multiplier;
 	m_state.score += dp;
 	if (incrementMultiplier) { ++m_state.multiplier; }
+	game()->audio().play(game()->resources.sfx.collect);
 	logger::info("[Player] collected {} points, X: {}", dp, m_state.multiplier);
 }
 
@@ -85,5 +87,7 @@ void Player::tick(DeltaTime dt) {
 	}
 
 	m_state.interact = cs.flags.test(Controller::Flag::eInteract);
+	auto const alpha = static_cast<vf::Rgba::Channel>(m_state.health.is_immune() ? 0xbb : 0xff);
+	sprite.instance().tint.channels[3] = alpha;
 }
 } // namespace rr

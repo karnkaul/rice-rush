@@ -27,8 +27,8 @@ std::optional<rr::Context> make_context(int argc, char const* const argv[]) {
 		return {};
 	}
 	auto ret = rr::Context{.env = std::move(env), .vf_context = std::move(*vf)};
-	ret.capo_instance = ktl::make_unique<capo::Instance>();
-	if (!ret.capo_instance->valid()) {
+	ret.capo_instance = capo::Instance::make();
+	if (!ret.capo_instance) {
 		logger::error("Failed to create capo instance");
 		return {};
 	}
@@ -47,7 +47,10 @@ std::optional<rr::Context> make_context(int argc, char const* const argv[]) {
 // }
 
 struct OneUp : rr::Consumable {
-	void consume() override { game()->player().heal(1); }
+	void consume() override {
+		game()->player().heal(1);
+		game()->audio().play(game()->resources.sfx.power_up);
+	}
 };
 
 using rr::util::random_range;
@@ -94,7 +97,10 @@ rr::Resources load_resources(rr::Context& context) {
 	loader(ret.textures.health, "textures/heart.png");
 	loader(ret.animations.player, "animations/player.anim");
 	loader(ret.animations.explode, "animations/explode.anim");
+	loader(ret.sfx.tick_tock, "sfx/tick_tock.wav");
 	loader(ret.sfx.explode, "sfx/explode.wav");
+	loader(ret.sfx.collect, "sfx/beep.wav");
+	loader(ret.sfx.power_up, "sfx/power_up.wav");
 	return ret;
 }
 

@@ -67,6 +67,7 @@ void Game::detach(Ptr<KeyListener> listener) { std::erase(m_impl->listeners, lis
 
 Keyboard const& Game::keyboard() const { return m_impl->keyboard; }
 Audio& Game::audio() const { return m_impl->audio; }
+float Game::sfx_gain() const { return context.config.config.sfx_gain; }
 
 void Game::handle(std::span<vf::Event const> events) {
 	for (auto const& event : events) {
@@ -80,6 +81,7 @@ void Game::handle(std::span<vf::Event const> events) {
 void Game::tick(vf::Time dt) {
 	m_state.elapsed += dt;
 	m_framerate.tick(dt);
+	m_impl->audio.set_sfx_gain(context.config.config.sfx_gain);
 	transfer_spawned();
 	auto const dlt = DeltaTime{.real = dt, .scaled = dt * time_scale};
 	if (m_state.state == State::ePlay) {

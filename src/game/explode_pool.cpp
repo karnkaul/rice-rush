@@ -17,7 +17,7 @@ void ExplodePool::tick(DeltaTime dt) {
 	auto& player = game()->player();
 	for (auto& entry : m_active) {
 		entry.sprite.tick(dt.scaled);
-		if (entry.ttl.force > 0s) {
+		if (entry.impulsed && entry.ttl.force > 0s) {
 			auto const to_player = player.sprite.instance().transform.position - entry.sprite.instance().transform.position;
 			if (auto const sqr_mag = glm::length2(to_player); sqr_mag > 0.0f) {
 				auto const dir = to_player / std::sqrt(sqr_mag);
@@ -34,6 +34,8 @@ void ExplodePool::tick(DeltaTime dt) {
 		}
 		return false;
 	});
+
+	m_was_immune = player.health().is_immune();
 }
 
 void ExplodePool::draw(vf::Frame const& frame) const {
@@ -55,6 +57,7 @@ auto ExplodePool::make_entry() -> Entry& {
 	ret.sprite.set_sheet(anim.sheet, anim.sequence);
 	ret.ttl.force = force.duration;
 	ret.ttl.anim = anim.sequence.duration;
+	ret.impulsed = !m_was_immune;
 	return ret;
 }
 } // namespace rr

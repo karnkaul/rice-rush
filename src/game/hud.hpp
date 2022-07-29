@@ -7,9 +7,9 @@ namespace rr {
 class Hud final : public GameObject {
   public:
 	vf::Time hurt_pulse{0.2s};
-	float health_icon_size{25.0f};
-	float health_lost_scale{0.75f};
-	std::uint8_t health_lost_alpha{0x55};
+	float health_icon_size{40.0f};
+	float health_lost_scale{0.8f};
+	std::uint8_t health_lost_alpha{0x77};
 	vf::Rgba bg_tint{vf::Rgba::make(0x504011ff)};
 
   private:

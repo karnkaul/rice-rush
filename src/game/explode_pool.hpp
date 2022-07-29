@@ -21,8 +21,10 @@ class ExplodePool : public GameObject {
 			vf::Time force{};
 			vf::Time anim{};
 		} ttl{};
+		bool impulsed{};
 	};
 
+	void setup() override { layer = layers::vfx; }
 	void tick(DeltaTime dt) override;
 	void draw(vf::Frame const& frame) const override;
 
@@ -30,5 +32,6 @@ class ExplodePool : public GameObject {
 
 	std::vector<Entry> m_active{};
 	std::vector<Entry> m_inactive{};
+	bool m_was_immune{};
 };
 } // namespace rr
