@@ -8,10 +8,12 @@ std::string trim(std::string_view str) {
 }
 
 Property Property::Parser::next() {
+	if (!in) { return {}; }
 	auto line = std::string{};
 	std::getline(in, line);
+	if (line.front() == '#') { return next(); }
 	auto const eq = line.find('=');
-	if (eq == std::string::npos) { return {}; }
+	if (eq == std::string::npos) { return next(); }
 	return {trim(std::string_view(line.data(), eq)), trim(std::string_view(line.data() + eq + 1, line.size() - eq - 1))};
 }
 } // namespace rr::util

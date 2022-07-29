@@ -13,10 +13,10 @@ class Frame;
 } // namespace vf
 
 namespace rr {
-class Context;
-class Audio;
+struct Context;
 struct Resources;
 
+class Audio;
 class Player;
 class Pawn;
 class CookerPool;
@@ -52,9 +52,9 @@ class Game {
 	void detach(Ptr<KeyListener> listener);
 
 	template <std::derived_from<GameObject> T, typename... Args>
-	Ptr<T> spawn(glm::vec2 position, Args&&... args) {
+	Ptr<T> spawn(Args&&... args) {
 		auto t = ktl::make_unique<T>(std::forward<Args>(args)...);
-		setup(*t, position);
+		setup(*t);
 		auto ret = t.get();
 		m_state.spawned.push_back(std::move(t));
 		return ret;
@@ -78,7 +78,7 @@ class Game {
 
   private:
 	void on_key(vf::KeyEvent const& key);
-	void setup(GameObject& go, glm::vec2 position);
+	void setup(GameObject& go);
 	template <typename T>
 	static void tick(std::vector<ktl::kunique_ptr<T>>& vec, DeltaTime dt);
 	static void tick(GameObject& go, DeltaTime dt);

@@ -28,8 +28,8 @@ target_sources(${PROJECT_NAME} PRIVATE
   game/controller.hpp
   game/cooker_pool.cpp
   game/cooker_pool.hpp
-  game/explode.cpp
-  game/explode.hpp
+  game/explode_pool.cpp
+  game/explode_pool.hpp
   game/game_object.cpp
   game/game_object.hpp
   game/game.cpp

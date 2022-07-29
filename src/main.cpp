@@ -72,7 +72,8 @@ struct DebugControls : rr::KeyListener {
 			game->cooker_pool()->spawn({random_cooker_pos(cooker_zone, offset, *game->cooker_pool()), vf::Time(random_range(2.0f, 5.0f))});
 		}
 		if (key(vf::Key::eBackslash, vf::Action::ePress)) {
-			auto consumable = game->spawn<OneUp>(random_range(-zone, zone) + offset);
+			auto consumable = game->spawn<OneUp>();
+			consumable->sprite.instance().transform.position = random_range(-zone, zone) + offset;
 			consumable->sprite.set_size({50.0f, 50.0f});
 			consumable->trigger.diameter = 75.0f;
 		}

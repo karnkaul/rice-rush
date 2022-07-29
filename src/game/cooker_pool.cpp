@@ -1,6 +1,6 @@
 #include <engine/context.hpp>
 #include <game/cooker_pool.hpp>
-#include <game/explode.hpp>
+#include <game/explode_pool.hpp>
 #include <game/game.hpp>
 #include <game/player.hpp>
 #include <game/resources.hpp>
@@ -37,6 +37,7 @@ bool CookerPool::intersecting(Trigger const& trigger) const {
 void CookerPool::setup() {
 	m_entries.mesh = {game()->context.vf_context, "cookers"};
 	m_entries.mesh.gbo.write(vf::Geometry::makeQuad());
+	m_explode_pool = game()->spawn<ExplodePool>();
 }
 
 void CookerPool::tick(DeltaTime dt) {
@@ -52,7 +53,7 @@ void CookerPool::tick(DeltaTime dt) {
 	std::erase_if(m_entries.entries, [this](Instanced<Entry>::Entry const& e) {
 		if (e.t.cooker.ready <= 0s) {
 			game()->player().hit();
-			game()->spawn<Explode>(e.t.trigger.centre);
+			m_explode_pool->spawn(e.t.trigger.centre);
 			return true;
 		}
 		return false;

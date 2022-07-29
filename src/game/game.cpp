@@ -46,7 +46,8 @@ Game::Game(Context& context, Resources& resources) : context(context), resources
 	layout.hud.offset.y = 0.5f * layout.play_area.extent.y;
 
 	m_player = ktl::make_unique<Player>();
-	setup(*m_player, layout.play_area.offset);
+	setup(*m_player);
+	m_player->sprite.instance().transform.position = layout.play_area.offset;
 	m_player->name = context.config.config.playerName;
 
 	m_background = ktl::make_unique<Background>(context.vf_context);
@@ -116,8 +117,8 @@ void Game::set(State state) {
 		m_state = {};
 		m_state.state = state;
 		m_player->reset();
-		m_cooker_pool = spawn<CookerPool>({});
-		m_hud = spawn<Hud>({});
+		m_cooker_pool = spawn<CookerPool>();
+		m_hud = spawn<Hud>();
 		logger::info("[Game] play");
 		break;
 	}
@@ -130,9 +131,8 @@ void Game::on_key(vf::KeyEvent const& key) {
 	m_impl->keyboard.on_key(key);
 }
 
-void Game::setup(GameObject& out, glm::vec2 position) {
+void Game::setup(GameObject& out) {
 	out.sprite = AnimatedSprite(context);
-	out.sprite.instance().transform.position = position;
 	out.m_game = this;
 	out.setup();
 }

@@ -21,9 +21,7 @@ struct Property::Parser {
 
 	template <typename F>
 	void parse_all(F&& func) {
-		while (in) {
-			if (auto property = next()) { func(std::move(property)); }
-		}
+		while (auto property = next()) { func(std::move(property)); }
 	}
 };
 

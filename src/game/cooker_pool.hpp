@@ -5,6 +5,8 @@
 #include <vulkify/graphics/primitives/text.hpp>
 
 namespace rr {
+class ExplodePool;
+
 class CookerPool : public GameObject {
   public:
 	using Points = std::uint32_t;
@@ -51,5 +53,6 @@ class CookerPool : public GameObject {
 
 	Instanced<Entry> m_entries{};
 	Prefab m_prefab{};
+	Ptr<ExplodePool> m_explode_pool{};
 };
 } // namespace rr
