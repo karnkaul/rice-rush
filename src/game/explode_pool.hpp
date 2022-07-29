@@ -1,4 +1,5 @@
 #pragma once
+#include <engine/animated_sprite.hpp>
 #include <game/game_object.hpp>
 
 namespace rr {

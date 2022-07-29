@@ -72,6 +72,11 @@ void Player::reset(glm::vec2 const position) {
 	sprite.instance().transform.position = trigger.centre = position;
 }
 
+void Player::setup() {
+	sprite = AnimatedSprite(game()->context, "player");
+	layer = layers::player;
+}
+
 void Player::tick(DeltaTime dt) {
 	m_state.health.tick(dt.scaled);
 	sprite.tick(dt.scaled);

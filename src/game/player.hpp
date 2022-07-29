@@ -1,4 +1,5 @@
 #pragma once
+#include <engine/animated_sprite.hpp>
 #include <engine/trigger.hpp>
 #include <game/controller.hpp>
 #include <game/game_object.hpp>
@@ -9,9 +10,11 @@ class Pawn;
 
 class Player : public GameObject {
   public:
+	AnimatedSprite sprite{};
 	Controller controller{};
 	std::string name{};
 	Trigger trigger{};
+
 	glm::vec2 size{150.0f};
 	float speed{500.0f};
 	int max_hp{3};
@@ -29,8 +32,9 @@ class Player : public GameObject {
 	Health const& health() const { return m_state.health; }
 
   private:
-	void setup() override { layer = layers::player; }
+	void setup() override;
 	void tick(DeltaTime dt) override;
+	void draw(vf::Frame const& frame) const override { sprite.draw(frame); }
 
 	struct {
 		Health health{};

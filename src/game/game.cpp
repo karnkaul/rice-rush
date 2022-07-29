@@ -134,7 +134,6 @@ void Game::on_key(vf::KeyEvent const& key) {
 }
 
 void Game::setup(GameObject& out) {
-	out.sprite = AnimatedSprite(context);
 	out.m_game = this;
 	out.setup();
 }

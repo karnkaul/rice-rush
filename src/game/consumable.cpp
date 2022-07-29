@@ -4,6 +4,8 @@
 #include <util/logger.hpp>
 
 namespace rr {
+void Consumable::setup() { sprite = AnimatedSprite(game()->context); }
+
 void Consumable::tick(DeltaTime dt) {
 	trigger.centre = sprite.instance().transform.position;
 	if (game()->player().trigger.intersecting(trigger)) {

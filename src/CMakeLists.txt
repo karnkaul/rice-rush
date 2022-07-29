@@ -37,7 +37,6 @@ target_sources(${PROJECT_NAME} PRIVATE
   game/hud.cpp
   game/hud.hpp
   game/layout.hpp
-  game/pawn.hpp
   game/player.cpp
   game/player.hpp
   game/resources.cpp
