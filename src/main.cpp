@@ -28,6 +28,10 @@ std::optional<rr::Context> make_context(int argc, char const* const argv[]) {
 	}
 	auto ret = rr::Context{.env = std::move(env), .vf_context = std::move(*vf)};
 	ret.capo_instance = ktl::make_unique<capo::Instance>();
+	if (!ret.capo_instance->valid()) {
+		logger::error("Failed to create capo instance");
+		return {};
+	}
 	ret.config = std::move(config);
 	ret.basis.scale = ret.basis_scale(ret.vf_context.framebufferExtent());
 	ret.audio = *ret.capo_instance;
@@ -48,15 +52,24 @@ struct OneUp : rr::Consumable {
 
 using rr::util::random_range;
 
+template <int MaxIter = 100>
+glm::vec2 random_cooker_pos(glm::vec2 const zone, glm::vec2 const offset, rr::CookerPool const& pool) {
+	auto make_pos = [zone, offset] { return random_range(-zone, zone) + offset; };
+	auto pos = make_pos();
+	for (int loops{}; loops < MaxIter && pool.intersecting(rr::Trigger{pos, pool.triggerDiameter}); ++loops) { pos = make_pos(); }
+	return pos;
+}
+
 struct DebugControls : rr::KeyListener {
 	rr::Ptr<rr::Game> game{};
 
 	void operator()(vf::KeyEvent const& key) override {
-		auto const zone = game->layout.play_area.extent * 0.5f;
+		auto const zone = 0.5f * game->layout.play_area.extent;
 		auto const offset = +game->layout.play_area.offset;
 		if (key(vf::Key::eEnter, vf::Action::ePress)) {
-			auto const cooker_zone = 0.75f * zone;
-			game->cooker_pool()->spawn({random_range(-cooker_zone, cooker_zone) + offset, vf::Time(random_range(2.0f, 5.0f))});
+			auto const cooker_size = game->cooker_pool()->prefab().size;
+			auto const cooker_zone = zone - 2.0f * cooker_size;
+			game->cooker_pool()->spawn({random_cooker_pos(cooker_zone, offset, *game->cooker_pool()), vf::Time(random_range(2.0f, 5.0f))});
 		}
 		if (key(vf::Key::eBackslash, vf::Action::ePress)) {
 			auto consumable = game->spawn<OneUp>(random_range(-zone, zone) + offset);
@@ -75,31 +88,30 @@ rr::Resources load_resources(rr::Context& context) {
 	auto loader = rr::Resources::Loader{context};
 	auto ret = rr::Resources{};
 	loader(ret.fonts.main, "fonts/main.ttf");
-	loader(ret.textures.background, "textures/tilesf5.jpg");
-	loader(ret.animations.player, "sprite_sheets/player.sheet");
+	loader(ret.textures.background, "textures/floor_tile.jpg");
+	loader(ret.textures.cooker, "textures/cooker.png");
+	loader(ret.textures.health, "textures/heart.png");
+	loader(ret.animations.player, "animations/player.anim");
+	loader(ret.animations.explode, "animations/explode.anim");
+	loader(ret.sfx.explode, "sfx/explode.wav");
 	return ret;
 }
 
 void run(rr::Context context) {
 	auto resources = load_resources(context);
 	auto game = rr::Game{context, resources};
-	game.audio().set_sfx_gain(0.2f);
+	// game.audio().set_sfx_gain(0.2f);
 	auto debug = DebugControls{};
 	debug.game = &game;
 
 	if constexpr (rr::debug_v) {
 		game.attach(&debug);
-		game.flags.set(rr::Game::Flag::eRenderTriggers);
+		// game.flags.set(rr::Game::Flag::eRenderTriggers);
 	}
 
-	auto player_sheet = rr::Sprite::Sheet{rr::util::make_texture(context, "textures/player/1.png")};
-	player_sheet.set_uvs(1, 6);
-
-	auto cooker_sheet = rr::Sprite::Sheet{rr::util::make_texture(context, "textures/cooker.png")};
-
 	game.set(rr::Game::State::ePlay);
-	auto const cooker_size = game.layout.basis.scale * glm::vec2{75.0f};
-	game.cooker_pool()->set_prefab({cooker_size, cooker_sheet.texture().handle()});
+	auto const cooker_size = game.layout.basis.scale * glm::vec2{100.0f};
+	game.cooker_pool()->set_prefab({cooker_size, resources.textures.cooker.handle()});
 
 	context.vf_context.show();
 	while (!context.vf_context.closing()) {

@@ -30,6 +30,7 @@ void Hud::setup() {
 		healthX += 2.0f * his;
 	}
 	m_health.gbo.write(vf::Geometry::makeQuad(vf::QuadCreateInfo{{his, his}}));
+	m_health.texture = game()->resources.textures.health.handle();
 
 	if constexpr (debug_v) {
 		m_debug = {vfc, "debug"};

@@ -11,6 +11,7 @@
 
 namespace rr {
 void CookerPool::set_prefab(Prefab prefab) {
+	m_prefab = prefab;
 	m_entries.mesh.gbo.write(vf::Geometry::makeQuad({prefab.size}));
 	m_entries.mesh.texture = prefab.texture;
 }
@@ -23,9 +24,14 @@ void CookerPool::spawn(Cooker const& cooker) {
 	entry.text = vf::Text(game()->context.vf_context, "cooker");
 	entry.text.setFont(&game()->resources.fonts.main).setHeight(textHeight).setString(util::format_elapsed(cooker.cook));
 	entry.text.transform().position = entry.trigger.centre;
-	entry.text.transform().position.y += 100.0f * basis().scale;
+	entry.text.transform().position.y += 0.75f * m_prefab.size.y;
+	entry.text.tint() = text_tint;
 
 	m_entries.add(cooker.position, std::move(entry));
+}
+
+bool CookerPool::intersecting(Trigger const& trigger) const {
+	return std::any_of(m_entries.entries.begin(), m_entries.entries.end(), [&trigger](auto const& e) { return e.t.trigger.intersecting(trigger); });
 }
 
 void CookerPool::setup() {

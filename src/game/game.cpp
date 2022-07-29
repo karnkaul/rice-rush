@@ -51,6 +51,9 @@ Game::Game(Context& context, Resources& resources) : context(context), resources
 
 	m_background = ktl::make_unique<Background>(context.vf_context);
 	m_background->set_texture(resources.textures.background, layout);
+
+	m_impl->audio = *context.capo_instance;
+	m_impl->audio.set_sfx_gain(context.config.config.sfx_gain);
 }
 
 void Game::attach(Ptr<KeyListener> listener) {

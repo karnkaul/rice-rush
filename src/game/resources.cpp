@@ -119,4 +119,15 @@ bool Resources::Loader::operator()(vf::Texture& out, std::string_view uri, Ptr<v
 
 bool Resources::Loader::operator()(Sprite::Sheet& out_sheet, std::string_view uri) const { return load(context, out_sheet, uri, {}); }
 bool Resources::Loader::operator()(SheetAnimation& out_anim, std::string_view uri) const { return load(context, out_anim.sheet, uri, &out_anim.sequence); }
+
+bool Resources::Loader::operator()(capo::Sound& out, std::string_view uri) const {
+	auto pcm = capo::PCM::fromFile(data_path(context.env, uri));
+	if (!pcm) {
+		logger::warn("[Resources] Failed to load PCM: [{}]", uri);
+		return false;
+	}
+	out = context.capo_instance->makeSound(*pcm);
+	logger::info("[Resources] Sound [{}] loaded", uri);
+	return true;
+}
 } // namespace rr

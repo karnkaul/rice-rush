@@ -23,10 +23,13 @@ class CookerPool : public GameObject {
 
 	void set_prefab(Prefab prefab);
 	void spawn(Cooker const& cooker);
+	Prefab const& prefab() const { return m_prefab; }
+	bool intersecting(Trigger const& trigger) const;
 
-	vf::Text::Height textHeight{30};
-	float triggerDiameter{200.0f};
+	vf::Text::Height textHeight{36};
+	float triggerDiameter{150.0f};
 	vf::Time vibrate{0.1s};
+	vf::Rgba text_tint{vf::white_v};
 
   private:
 	struct Entry {
@@ -47,5 +50,6 @@ class CookerPool : public GameObject {
 	void pop(Instanced<Entry>::Entry& entry);
 
 	Instanced<Entry> m_entries{};
+	Prefab m_prefab{};
 };
 } // namespace rr

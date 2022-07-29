@@ -2,6 +2,7 @@
 #include <util/logger.hpp>
 #include <util/property.hpp>
 #include <fstream>
+#include <iomanip>
 
 namespace rr {
 namespace {
@@ -32,6 +33,10 @@ void populate(Config& out, std::string_view key, std::string value) {
 		out.extent.x = static_cast<std::uint32_t>(std::atoi(value.c_str()));
 	} else if (key == "height") {
 		out.extent.y = static_cast<std::uint32_t>(std::atoi(value.c_str()));
+	} else if (key == "music") {
+		out.music_gain = static_cast<float>(std::atof(value.c_str()));
+	} else if (key == "sfx") {
+		out.sfx_gain = static_cast<float>(std::atof(value.c_str()));
 	}
 }
 } // namespace
@@ -52,6 +57,7 @@ bool Config::Scoped::save(Config const& config, char const* path) {
 	file << "name = " << config.playerName << '\n';
 	file << "aa = " << aa(config.antiAliasing) << '\n';
 	file << "width = " << config.extent.x << "\nheight = " << config.extent.y << '\n';
+	file << ktl::kformat("sfx = {:1.1f}\nmusic = {:1.1f}\n", config.sfx_gain, config.music_gain);
 	logger::info("[Config] saved to [{}]", path);
 	return true;
 }

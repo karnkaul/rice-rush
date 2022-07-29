@@ -4,7 +4,7 @@
 namespace rr {
 struct Trigger {
 	glm::vec2 centre{};
-	float diameter{200.0f};
+	float diameter{150.0f};
 	bool interactable{};
 
 	constexpr bool intersecting(Trigger const& other) const {

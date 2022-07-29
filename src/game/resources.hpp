@@ -1,4 +1,5 @@
 #pragma once
+#include <capo/sound.hpp>
 #include <engine/sprite.hpp>
 #include <util/index_timeline.hpp>
 #include <util/ptr.hpp>
@@ -21,13 +22,17 @@ struct Resources {
 	struct {
 		vf::Texture background{};
 		vf::Texture health{};
+		vf::Texture cooker{};
 	} textures{};
 
 	struct {
 		SheetAnimation explode{};
-		SheetAnimation cooker{};
 		SheetAnimation player{};
 	} animations{};
+
+	struct {
+		capo::Sound explode{};
+	} sfx{};
 
 	struct Loader;
 };
@@ -40,5 +45,7 @@ struct Resources::Loader {
 
 	bool operator()(Sprite::Sheet& out, std::string_view uri) const;
 	bool operator()(SheetAnimation& out_anim, std::string_view uri) const;
+
+	bool operator()(capo::Sound& out, std::string_view uri) const;
 };
 } // namespace rr

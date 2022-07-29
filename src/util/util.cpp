@@ -20,7 +20,7 @@ std::string util::format_elapsed(vf::Time elapsed) {
 		str << std::setw(2) << m.count() << ':' << std::setw(2) << s.count();
 	} else {
 		auto const ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed) - h - m - s;
-		str << s.count() << '.' << std::setw(2) << ms.count() / 10;
+		str << s.count() << '.' << ms.count() / 100;
 	}
 	return str.str();
 }

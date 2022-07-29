@@ -13,6 +13,7 @@ class Explode : public GameObject {
 	float timeScale{0.75f};
 
   private:
+	void setup() override;
 	void tick(DeltaTime dt) override;
 
 	vf::Time m_elapsed{};
