@@ -5,7 +5,7 @@ namespace rr {
 class Audio {
   public:
 	Audio() = default;
-	Audio(capo::Instance& instance) { m_sfx = instance.makeSource(); }
+	Audio(capo::Instance& instance) { m_sfx = instance.make_source(); }
 
 	Audio& set_sfx_gain(float value) {
 		m_sfx.gain(value);

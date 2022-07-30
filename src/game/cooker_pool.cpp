@@ -38,7 +38,7 @@ void CookerPool::setup() {
 	m_entries.mesh = {game()->context.vf_context, "cookers"};
 	m_entries.mesh.gbo.write(vf::Geometry::makeQuad());
 
-	m_sfx = game()->context.capo_instance->makeSource();
+	m_sfx = game()->context.capo_instance->make_source();
 	m_sfx.loop(true);
 	m_sfx.bind(game()->resources.sfx.tick_tock);
 

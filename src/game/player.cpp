@@ -49,23 +49,23 @@ void Player::collect(std::uint32_t points, bool incrementMultiplier) {
 	m_state.score += dp;
 	if (incrementMultiplier) { ++m_state.multiplier; }
 	game()->audio().play(game()->resources.sfx.collect);
-	logger::info("[Player] collected {} points, X: {}", dp, m_state.multiplier);
+	logger::debug("[Player] collected {} points, X: {}", dp, m_state.multiplier);
 }
 
 void Player::hit() {
 	if (m_state.health.hit()) {
 		m_state.multiplier = std::max(m_state.multiplier / 2, 1U);
-		logger::info("[Player] hit; hp: {}, X: {}", m_state.health.hp, m_state.multiplier);
+		logger::debug("[Player] hit; hp: {}, X: {}", m_state.health.hp, m_state.multiplier);
 	}
 }
 
 void Player::heal(int hp) {
 	m_state.health.hp = std::min(m_state.health.hp + hp, max_hp);
-	logger::info("[Player] heal: {}; hp: {}", hp, m_state.health.hp);
+	logger::debug("[Player] heal: {}; hp: {}", hp, m_state.health.hp);
 }
 
 void Player::reset(glm::vec2 const position) {
-	logger::info("[Player] reset");
+	logger::debug("[Player] reset");
 	m_state = {};
 	auto const& anim = game()->resources.animations.player;
 	sprite.set_sheet(anim.sheet, anim.sequence).set_size(size * basis().scale);

@@ -2,10 +2,10 @@
 #include <engine/context.hpp>
 #include <engine/env.hpp>
 #include <game/background.hpp>
-#include <game/consumable.hpp>
 #include <game/cooker_pool.hpp>
 #include <game/game.hpp>
 #include <game/player.hpp>
+#include <game/powerup.hpp>
 #include <game/resources.hpp>
 #include <util/collection.hpp>
 #include <util/logger.hpp>
@@ -46,13 +46,6 @@ std::optional<rr::Context> make_context(int argc, char const* const argv[]) {
 // 	}
 // }
 
-struct OneUp : rr::Consumable {
-	void consume() override {
-		game()->player().heal(1);
-		game()->audio().play(game()->resources.sfx.power_up);
-	}
-};
-
 using rr::util::random_range;
 
 template <int MaxIter = 100>
@@ -63,8 +56,14 @@ glm::vec2 random_cooker_pos(glm::vec2 const zone, glm::vec2 const offset, rr::Co
 	return pos;
 }
 
+void heal_player(rr::Game& game) {
+	game.player().heal(1);
+	game.audio().play(game.resources.sfx.power_up);
+}
+
 struct DebugControls : rr::KeyListener {
 	rr::Ptr<rr::Game> game{};
+	rr::Ptr<rr::Powerup> powerup{};
 
 	void operator()(vf::KeyEvent const& key) override {
 		auto const zone = 0.5f * game->layout.play_area.extent;
@@ -74,12 +73,20 @@ struct DebugControls : rr::KeyListener {
 			auto const cooker_zone = zone - 2.0f * cooker_size;
 			game->cooker_pool()->spawn({random_cooker_pos(cooker_zone, offset, *game->cooker_pool()), vf::Time(random_range(2.0f, 5.0f))});
 		}
-		if (key(vf::Key::eBackslash, vf::Action::ePress)) {
-			auto consumable = game->spawn<OneUp>();
-			consumable->sprite.instance().transform.position = random_range(-zone, zone) + offset;
-			consumable->sprite.set_size({50.0f, 50.0f});
-			consumable->trigger.diameter = 75.0f;
+		if (key(vf::Key::eBackslash, vf::Action::ePress) && powerup) {
+			if (powerup->active()) {
+				powerup->deactivate();
+			} else {
+				auto request = rr::Powerup::Request{
+					.modify = &heal_player,
+					.sheet = &game->resources.animations.player.sheet,
+					.sequence = game->resources.animations.player.sequence,
+					.diameter = 75.0f,
+				};
+				powerup->activate(std::move(request), powerup->random_position());
+			}
 		}
+		if (key(vf::Key::eT, vf::Action::eRelease, vf::Mod::eCtrl)) { game->flags.flip(rr::Game::Flag::eRenderTriggers); }
 		if (key(vf::Key::eW, vf::Action::eRelease, vf::Mod::eCtrl)) { game->context.vf_context.close(); }
 		if (key(vf::Key::eP, vf::Action::eRelease, vf::Mod::eCtrl)) {
 			auto const vsync = game->context.vf_context.vsync() == vf::VSync::eOff ? vf::VSync::eOn : vf::VSync::eOff;
@@ -117,6 +124,7 @@ void run(rr::Context context) {
 	}
 
 	game.set(rr::Game::State::ePlay);
+	debug.powerup = game.spawn<rr::Powerup>();
 	auto const cooker_size = game.layout.basis.scale * glm::vec2{100.0f};
 	game.cooker_pool()->set_prefab({cooker_size, resources.textures.cooker.handle()});
 

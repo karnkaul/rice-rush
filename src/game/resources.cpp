@@ -82,7 +82,7 @@ bool load(Context const& context, Sprite::Sheet& out_sheet, std::string_view uri
 	out_sheet.set_uvs(static_cast<std::size_t>(info.tile_count.y), static_cast<std::size_t>(info.tile_count.x));
 	if (out_sequence && out_sequence->end <= out_sequence->begin) { out_sequence->end = out_sheet.uv_count(); }
 
-	logger::info("[Resources] Sprite::Sheet [{}] loaded", uri);
+	logger::debug("[Resources] Sprite::Sheet [{}] loaded", uri);
 	return true;
 }
 } // namespace
@@ -90,7 +90,7 @@ bool load(Context const& context, Sprite::Sheet& out_sheet, std::string_view uri
 bool Resources::Loader::operator()(vf::Ttf& out, std::string_view uri) const {
 	if (!out) { out = vf::Ttf(context.vf_context, std::string(uri)); }
 	if (out.load(data_path(context.env, uri).c_str())) {
-		logger::info("[Resources] Ttf [{}] loaded", uri);
+		logger::debug("[Resources] Ttf [{}] loaded", uri);
 		return true;
 	} else {
 		logger::warn("[Resources] Failed to load Ttf: [{}]", uri);
@@ -113,7 +113,7 @@ bool Resources::Loader::operator()(vf::Texture& out, std::string_view uri, Ptr<v
 		logger::warn("[Resources] Failed to create Texture: [{}]", uri);
 		return false;
 	}
-	logger::info("[Resources] Texture [{}] loaded", uri);
+	logger::debug("[Resources] Texture [{}] loaded", uri);
 	return true;
 }
 
@@ -121,13 +121,13 @@ bool Resources::Loader::operator()(Sprite::Sheet& out_sheet, std::string_view ur
 bool Resources::Loader::operator()(SheetAnimation& out_anim, std::string_view uri) const { return load(context, out_anim.sheet, uri, &out_anim.sequence); }
 
 bool Resources::Loader::operator()(capo::Sound& out, std::string_view uri) const {
-	auto pcm = capo::PCM::fromFile(data_path(context.env, uri));
+	auto pcm = capo::PCM::from_file(data_path(context.env, uri));
 	if (!pcm) {
 		logger::warn("[Resources] Failed to load PCM: [{}]", uri);
 		return false;
 	}
-	out = context.capo_instance->makeSound(*pcm);
-	logger::info("[Resources] Sound [{}] loaded", uri);
+	out = context.capo_instance->make_sound(*pcm);
+	logger::debug("[Resources] Sound [{}] loaded", uri);
 	return true;
 }
 } // namespace rr

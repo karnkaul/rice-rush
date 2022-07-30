@@ -4,7 +4,7 @@ include(FetchContent)
 FetchContent_Declare(
   capo
   GIT_REPOSITORY https://github.com/capo-devs/capo
-  GIT_TAG 14e5bc1 # change to version tag after all bug-fixes etc
+  GIT_TAG ae36b37 # change to version tag after all bug-fixes etc
   SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/capo"
 )
 set(CAPO_BUILD_EXAMPLE ON)

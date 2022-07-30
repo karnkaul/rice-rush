@@ -13,4 +13,10 @@ void AnimatedSprite::tick(vf::Time dt) {
 	timeline.tick(dt);
 	set_uv_index(timeline.index());
 }
+
+AnimatedSprite& AnimatedSprite::unset_sheet() {
+	Sprite::set_sheet({});
+	timeline = {};
+	return *this;
+}
 } // namespace rr

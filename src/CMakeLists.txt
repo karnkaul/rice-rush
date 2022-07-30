@@ -22,8 +22,6 @@ target_sources(${PROJECT_NAME} PRIVATE
 
   game/background.cpp
   game/background.hpp
-  game/consumable.cpp
-  game/consumable.hpp
   game/controller.cpp
   game/controller.hpp
   game/cooker_pool.cpp
@@ -39,6 +37,8 @@ target_sources(${PROJECT_NAME} PRIVATE
   game/layout.hpp
   game/player.cpp
   game/player.hpp
+  game/powerup.cpp
+  game/powerup.hpp
   game/resources.cpp
   game/resources.hpp
 
