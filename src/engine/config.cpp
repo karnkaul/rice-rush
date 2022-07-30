@@ -1,10 +1,14 @@
 #include <engine/config.hpp>
+#include <engine/env.hpp>
 #include <util/logger.hpp>
 #include <util/property.hpp>
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 
 namespace rr {
+namespace fs = std::filesystem;
+
 namespace {
 constexpr vf::AntiAliasing aa(std::string_view const str) {
 	if (str == "16x") { return vf::AntiAliasing::e16x; }
@@ -39,26 +43,39 @@ void populate(Config& out, std::string_view key, std::string value) {
 		out.sfx_gain = static_cast<float>(std::atof(value.c_str()));
 	}
 }
-} // namespace
 
-Config Config::Scoped::load(const char* path) {
-	auto ret = Config{};
+bool read(Config& out, const char* path) {
 	auto file = std::ifstream(path);
-	if (!file) { return ret; }
+	if (!file) { return false; }
 	auto parser = util::Property::Parser{file};
-	parser.parse_all([&](util::Property property) { populate(ret, property.key, property.value); });
-	logger::info("[Config] loaded from [{}]", path);
-	return ret;
+	parser.parse_all([&](util::Property property) { populate(out, property.key, property.value); });
+	return true;
 }
 
-bool Config::Scoped::save(Config const& config, char const* path) {
+bool write(Config const& config, char const* path) {
 	auto file = std::ofstream(path);
 	if (!file) { return false; }
 	file << "name = " << config.playerName << '\n';
 	file << "aa = " << aa(config.antiAliasing) << '\n';
 	file << "width = " << config.extent.x << "\nheight = " << config.extent.y << '\n';
 	file << ktl::kformat("sfx = {:1.1f}\nmusic = {:1.1f}\n", config.sfx_gain, config.music_gain);
-	logger::info("[Config] saved to [{}]", path);
 	return true;
+}
+} // namespace
+
+Config Config::load(Env const& env, const char* uri, bool create_if_absent) {
+	auto const path = exe_path(env, uri);
+	bool const exists = fs::is_regular_file(path);
+	auto ret = Config{};
+	if (!exists && create_if_absent && write(ret, path.c_str())) { logger::info("[Config] Default config saved to [{}]", path); }
+	if (fs::is_regular_file(uri) && read(ret, uri)) {
+		logger::info("[Config] loaded overridden config [./{}]", uri);
+		return ret;
+	}
+	if (exists && read(ret, path.c_str())) {
+		logger::info("[Config] loaded config from [{}]", path);
+		return ret;
+	}
+	return ret;
 }
 } // namespace rr

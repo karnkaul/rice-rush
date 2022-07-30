@@ -35,12 +35,8 @@ bool Powerup::activate(Request request, glm::vec2 position) {
 	}
 
 	m_request = request;
-	if (m_request.sheet) {
-		m_sprite.set_sheet(*m_request.sheet, m_request.sequence);
-	} else {
-		m_sprite.unset_sheet();
-	}
-	m_sprite.set_size(glm::vec2{m_request.diameter * 0.5f});
+	m_request.diameter *= basis().scale;
+	m_sprite.set_sheet(m_request.sheet).set_uv_index(m_request.uv_index).set_size(glm::vec2{m_request.diameter});
 
 	m_sprite.instance().transform.position = m_trigger.centre = position;
 	m_trigger.diameter = m_request.diameter;
@@ -51,6 +47,7 @@ bool Powerup::activate(Request request, glm::vec2 position) {
 void Powerup::deactivate() {
 	logger::debug("[Powerup] Modifier deactivated");
 	m_request.modify = {};
+	m_elapsed = {};
 }
 
 void Powerup::setup() {
@@ -61,7 +58,10 @@ void Powerup::setup() {
 void Powerup::tick(DeltaTime dt) {
 	if (!active()) { return; }
 
-	m_sprite.tick(dt.scaled);
+	auto const squish = squish_rate * m_elapsed.count();
+	auto const delta = squish_coeff * glm::vec2{std::cos(squish), std::sin(squish)};
+	m_sprite.instance().transform.scale = glm::vec2{1.0f} + delta;
+
 	if (m_trigger.intersecting(game()->player().trigger)) {
 		m_request.modify(*game());
 		deactivate();
@@ -69,6 +69,7 @@ void Powerup::tick(DeltaTime dt) {
 	}
 
 	m_request.ttl -= dt.real;
+	m_elapsed += dt.real;
 	if (m_request.ttl <= 0s) { deactivate(); }
 }
 

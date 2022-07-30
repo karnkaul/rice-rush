@@ -4,30 +4,15 @@
 #include <string>
 
 namespace rr {
-struct Config {
-	struct Scoped;
+struct Env;
 
+struct Config {
 	std::string playerName{"Bowl"};
 	vf::AntiAliasing antiAliasing{vf::AntiAliasing::eNone};
 	glm::uvec2 extent{1280, 720};
 	float sfx_gain{1.0f};
 	float music_gain{1.0f};
-};
 
-struct Config::Scoped {
-  public:
-	Scoped() = default;
-	Scoped(std::string path) : config(load(path.c_str())), path(std::move(path)) {}
-	Scoped(Scoped&&) = default;
-	Scoped& operator=(Scoped&&) = default;
-	~Scoped() {
-		if (!path.empty()) { save(config, path.c_str()); }
-	}
-
-	static Config load(char const* path);
-	static bool save(Config const& config, char const* path);
-
-	Config config{};
-	std::string path{};
+	static Config load(Env const& env, char const* uri, bool create_if_absent = true);
 };
 } // namespace rr

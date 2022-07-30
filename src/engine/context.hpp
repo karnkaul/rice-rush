@@ -12,7 +12,7 @@ struct Context {
 	Env env{};
 	ktl::kunique_ptr<capo::Instance> capo_instance{};
 	vf::Context vf_context;
-	Config::Scoped config{};
+	Config config{};
 
 	Audio audio{};
 	Basis basis{};

@@ -17,9 +17,9 @@ using namespace std::chrono_literals;
 
 std::optional<rr::Context> make_context(int argc, char const* const argv[]) {
 	auto env = rr::Env::make(argc, argv);
-	auto config = rr::Config::Scoped(rr::exe_path(env, "config.txt"));
+	auto config = rr::Config::load(env, "config.txt");
 	auto builder = vf::Builder{};
-	builder.setExtent(config.config.extent).setAntiAliasing(config.config.antiAliasing);
+	builder.setExtent(config.extent).setAntiAliasing(config.antiAliasing);
 	// builder.setExtent({1920, 1080});
 	auto vf = builder.build();
 	if (!vf) {
@@ -79,9 +79,6 @@ struct DebugControls : rr::KeyListener {
 			} else {
 				auto request = rr::Powerup::Request{
 					.modify = &heal_player,
-					.sheet = &game->resources.animations.player.sheet,
-					.sequence = game->resources.animations.player.sequence,
-					.diameter = 75.0f,
 				};
 				powerup->activate(std::move(request), powerup->random_position());
 			}

@@ -11,4 +11,4 @@ compile_commands.json
 /CMakeUserPresets.json
 
 # Test files
-settings.ini
+config.txt

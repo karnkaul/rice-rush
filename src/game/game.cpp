@@ -48,13 +48,13 @@ Game::Game(Context& context, Resources& resources) : context(context), resources
 	m_player = ktl::make_unique<Player>();
 	setup(*m_player);
 	m_player->sprite.instance().transform.position = layout.play_area.offset;
-	m_player->name = context.config.config.playerName;
+	m_player->name = context.config.playerName;
 
 	m_background = ktl::make_unique<Background>(context.vf_context);
 	m_background->set_texture(resources.textures.background, layout);
 
 	m_impl->audio = *context.capo_instance;
-	m_impl->audio.set_sfx_gain(context.config.config.sfx_gain);
+	m_impl->audio.set_sfx_gain(context.config.sfx_gain);
 }
 
 void Game::attach(Ptr<KeyListener> listener) {
@@ -67,7 +67,7 @@ void Game::detach(Ptr<KeyListener> listener) { std::erase(m_impl->listeners, lis
 
 Keyboard const& Game::keyboard() const { return m_impl->keyboard; }
 Audio& Game::audio() const { return m_impl->audio; }
-float Game::sfx_gain() const { return context.config.config.sfx_gain; }
+float Game::sfx_gain() const { return context.config.sfx_gain; }
 
 void Game::handle(std::span<vf::Event const> events) {
 	for (auto const& event : events) {
@@ -81,7 +81,7 @@ void Game::handle(std::span<vf::Event const> events) {
 void Game::tick(vf::Time dt) {
 	m_state.elapsed += dt;
 	m_framerate.tick(dt);
-	m_impl->audio.set_sfx_gain(context.config.config.sfx_gain);
+	m_impl->audio.set_sfx_gain(context.config.sfx_gain);
 	transfer_spawned();
 	auto const dlt = DeltaTime{.real = dt, .scaled = dt * time_scale};
 	if (m_state.state == State::ePlay) {
