@@ -7,8 +7,8 @@ namespace rr {
 struct Env;
 
 struct Config {
-	std::string playerName{"Bowl"};
 	vf::AntiAliasing antiAliasing{vf::AntiAliasing::eNone};
+	vf::VSync vsync{vf::VSync::eOn};
 	glm::uvec2 extent{1280, 720};
 	float sfx_gain{1.0f};
 	float music_gain{1.0f};

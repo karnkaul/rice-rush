@@ -19,7 +19,7 @@ std::optional<rr::Context> make_context(int argc, char const* const argv[]) {
 	auto env = rr::Env::make(argc, argv);
 	auto config = rr::Config::load(env, "config.txt");
 	auto builder = vf::Builder{};
-	builder.setExtent(config.extent).setAntiAliasing(config.antiAliasing);
+	builder.setExtent(config.extent).setAntiAliasing(config.antiAliasing).setVsyncs({config.vsync});
 	auto vf = builder.build();
 	if (!vf) {
 		logger::error("Failed to create vulkify instance");
@@ -64,10 +64,6 @@ struct DebugControls : rr::KeyListener {
 		}
 		if (key(vf::Key::eT, vf::Action::eRelease, vf::Mod::eCtrl)) { game->flags.flip(rr::Game::Flag::eRenderTriggers); }
 		if (key(vf::Key::eW, vf::Action::eRelease, vf::Mod::eCtrl)) { game->context.vf_context.close(); }
-		if (key(vf::Key::eP, vf::Action::eRelease, vf::Mod::eCtrl)) {
-			auto const vsync = game->context.vf_context.vsync() == vf::VSync::eOff ? vf::VSync::eOn : vf::VSync::eOff;
-			game->context.vf_context.setVSync(vsync);
-		}
 	}
 };
 

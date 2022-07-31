@@ -28,10 +28,25 @@ constexpr std::string_view aa(vf::AntiAliasing const a) {
 	}
 }
 
+constexpr vf::VSync vsync(std::string_view const str) {
+	if (str == "off") {
+		return vf::VSync::eOff;
+	} else if (str == "adaptive") {
+		return vf::VSync::eAdaptive;
+	}
+	return vf::VSync::eOn;
+}
+
+constexpr std::string_view vsync(vf::VSync const v) {
+	switch (v) {
+	case vf::VSync::eAdaptive: return "adaptive";
+	case vf::VSync::eOff: return "off";
+	default: return "on";
+	}
+}
+
 void populate(Config& out, std::string_view key, std::string value) {
-	if (key == "name") {
-		out.playerName = std::move(value);
-	} else if (key == "aa" || key == "anti_aliasing") {
+	if (key == "aa" || key == "anti_aliasing") {
 		out.antiAliasing = aa(value);
 	} else if (key == "width") {
 		out.extent.x = static_cast<std::uint32_t>(std::atoi(value.c_str()));
@@ -41,6 +56,8 @@ void populate(Config& out, std::string_view key, std::string value) {
 		out.music_gain = static_cast<float>(std::atof(value.c_str()));
 	} else if (key == "sfx") {
 		out.sfx_gain = static_cast<float>(std::atof(value.c_str()));
+	} else if (key == "vsync") {
+		out.vsync = vsync(value);
 	}
 }
 
@@ -55,10 +72,10 @@ bool read(Config& out, const char* path) {
 bool write(Config const& config, char const* path) {
 	auto file = std::ofstream(path);
 	if (!file) { return false; }
-	file << "name = " << config.playerName << '\n';
 	file << "aa = " << aa(config.antiAliasing) << '\n';
 	file << "width = " << config.extent.x << "\nheight = " << config.extent.y << '\n';
 	file << ktl::kformat("sfx = {:1.1f}\nmusic = {:1.1f}\n", config.sfx_gain, config.music_gain);
+	file << "vsync = " << vsync(config.vsync) << '\n';
 	return true;
 }
 } // namespace

@@ -48,6 +48,7 @@ void Director::spawn_powerup() const {
 }
 
 void Director::next_wave() {
+	m_wave.ttl += 5s;
 	m_wave.spawn_delay.first = decrement(m_wave.spawn_delay.first, 0.5s, 0.2s);
 	m_wave.spawn_delay.second = decrement(m_wave.spawn_delay.second, 1s, 0.5s);
 	m_wave.pressure = std::max(m_active.pressure, m_wave.pressure + 2);

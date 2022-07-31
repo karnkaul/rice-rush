@@ -12,7 +12,6 @@ class Player : public GameObject {
   public:
 	AnimatedSprite sprite{};
 	Controller controller{};
-	std::string name{};
 	Trigger trigger{};
 
 	glm::vec2 size{150.0f};
