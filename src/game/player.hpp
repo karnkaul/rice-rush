@@ -24,7 +24,8 @@ class Player : public GameObject {
 	void collect(std::uint32_t points, bool increment_multiplier = true);
 	void hit();
 	void heal(int hp);
-	bool interact() const { return m_state.interact; }
+	bool interact() const { return m_state.flags.test(Controller::Flag::eInteract); }
+	bool start() const { return m_state.flags.test(Controller::Flag::eStart); }
 
 	void reset(glm::vec2 position = {});
 
@@ -40,7 +41,7 @@ class Player : public GameObject {
 		Health health{};
 		std::uint64_t score{};
 		std::uint32_t multiplier{1};
-		bool interact{};
+		Controller::Flags flags{};
 	} m_state{};
 };
 } // namespace rr

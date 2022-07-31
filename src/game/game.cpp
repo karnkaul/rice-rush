@@ -10,8 +10,21 @@
 #include <game/resources.hpp>
 #include <util/logger.hpp>
 #include <algorithm>
+#include <fstream>
 
 namespace rr {
+namespace {
+std::uint64_t read_high_score(char const* path) {
+	auto ret = std::uint64_t{};
+	if (auto file = std::ifstream(path)) { file >> ret; }
+	return ret;
+}
+
+void write_high_score(std::uint64_t score, char const* path) {
+	if (auto file = std::ofstream(path)) { file << score << '\n'; }
+}
+} // namespace
+
 struct Game::Impl {
 	Resources resources{};
 	rr::TriggerRenderer trigger_renderer;
@@ -57,6 +70,7 @@ Game::Game(Context& context, Resources& resources) : context(context), resources
 
 	m_impl->audio = *context.capo_instance;
 	m_impl->audio.set_sfx_gain(context.config.sfx_gain);
+	m_impl->high_score = read_high_score("high_score.rr");
 }
 
 void Game::attach(Ptr<KeyListener> listener) {
@@ -87,10 +101,11 @@ void Game::tick(vf::Time dt) {
 	transfer_spawned();
 	auto const dlt = DeltaTime{.real = dt, .scaled = dt * time_scale};
 	tick(player(), dlt);
-	if (m_state.state == State::ePlay) {
-		if (player().health().hp <= 0) { set(State::eOver); }
-	}
 	tick(m_state.objects, dlt);
+
+	auto const st = state();
+	if (st == Game::State::eOver && player().start()) { set(Game::State::ePlay); }
+	if (st == State::ePlay && player().health().hp <= 0) { set(State::eOver); }
 }
 
 void Game::render(vf::Frame const& frame) const {
@@ -116,6 +131,7 @@ void Game::set(State state) {
 		m_state.state = state;
 		logger::info("[Game] over; score: {}", player().score());
 		m_impl->high_score = std::max(m_impl->high_score, player().score());
+		write_high_score(m_impl->high_score, "high_score.rr");
 		break;
 	}
 	case State::ePlay: {

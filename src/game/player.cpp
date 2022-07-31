@@ -70,6 +70,7 @@ void Player::reset(glm::vec2 const position) {
 	auto const& anim = game()->resources.animations.player;
 	sprite.set_sheet(anim.sheet, anim.sequence).set_size(size * basis().scale);
 	sprite.instance().transform.position = trigger.centre = position;
+	sprite.instance().transform.scale = glm::vec2{1.0f};
 }
 
 void Player::setup() {
@@ -79,24 +80,22 @@ void Player::setup() {
 
 void Player::tick(DeltaTime dt) {
 	auto const cs = controller.update(game()->keyboard());
-	if (game()->state() == Game::State::ePlay) {
-		m_state.health.tick(dt.scaled);
-		sprite.tick(dt.scaled);
+	m_state.flags = cs.flags;
+	if (game()->state() != Game::State::ePlay) { return; }
 
-		translate(cs.xy * speed * basis().scale * dt.scaled.count());
-		if (std::abs(cs.xy.x) > 0.01f) {
-			if (cs.xy.x < 0.0f) {
-				sprite.instance().transform.scale.x = -1.0f;
-			} else {
-				sprite.instance().transform.scale.x = 1.0f;
-			}
+	m_state.health.tick(dt.scaled);
+	sprite.tick(dt.scaled);
+
+	translate(cs.xy * speed * basis().scale * dt.scaled.count());
+	if (std::abs(cs.xy.x) > 0.01f) {
+		if (cs.xy.x < 0.0f) {
+			sprite.instance().transform.scale.x = -1.0f;
+		} else {
+			sprite.instance().transform.scale.x = 1.0f;
 		}
-
-		m_state.interact = cs.flags.test(Controller::Flag::eInteract);
-		auto const alpha = static_cast<vf::Rgba::Channel>(m_state.health.is_immune() ? 0xbb : 0xff);
-		sprite.instance().tint.channels[3] = alpha;
-	} else if (game()->state() == Game::State::eOver && cs.flags.test(Controller::Flag::eStart)) {
-		game()->set(Game::State::ePlay);
 	}
+
+	auto const alpha = static_cast<vf::Rgba::Channel>(m_state.health.is_immune() ? 0xbb : 0xff);
+	sprite.instance().tint.channels[3] = alpha;
 }
 } // namespace rr
