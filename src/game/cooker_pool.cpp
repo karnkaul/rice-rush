@@ -5,6 +5,7 @@
 #include <game/player.hpp>
 #include <game/resources.hpp>
 #include <glm/gtx/norm.hpp>
+#include <util/logger.hpp>
 #include <util/random.hpp>
 #include <util/util.hpp>
 #include <algorithm>
@@ -28,6 +29,12 @@ void CookerPool::spawn(Cooker const& cooker) {
 	entry.text.tint() = text_tint;
 
 	m_entries.add(cooker.position, std::move(entry));
+}
+
+std::size_t CookerPool::sweep_ready() {
+	auto const ret = std::erase_if(m_entries.entries, [](auto const& entry) { return entry.t.cooker.cook <= 0s; });
+	logger::debug("[Cookers] swept [{}] ready cookers", ret);
+	return ret;
 }
 
 bool CookerPool::intersecting(Trigger const& trigger) const {

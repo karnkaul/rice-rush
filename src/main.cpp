@@ -56,11 +56,6 @@ glm::vec2 random_cooker_pos(glm::vec2 const zone, glm::vec2 const offset, rr::Co
 	return pos;
 }
 
-void heal_player(rr::Game& game) {
-	game.player().heal(1);
-	game.audio().play(game.resources.sfx.power_up);
-}
-
 struct DebugControls : rr::KeyListener {
 	rr::Ptr<rr::Game> game{};
 	rr::Ptr<rr::Powerup> powerup{};
@@ -77,10 +72,9 @@ struct DebugControls : rr::KeyListener {
 			if (powerup->active()) {
 				powerup->deactivate();
 			} else {
-				auto request = rr::Powerup::Request{
-					.modify = &heal_player,
-				};
-				powerup->activate(std::move(request), powerup->random_position());
+				// powerup->activate_heal(1);
+				// powerup->activate_slowmo(0.5f);
+				powerup->activate_sweep();
 			}
 		}
 		if (key(vf::Key::eT, vf::Action::eRelease, vf::Mod::eCtrl)) { game->flags.flip(rr::Game::Flag::eRenderTriggers); }
@@ -95,23 +89,13 @@ struct DebugControls : rr::KeyListener {
 rr::Resources load_resources(rr::Context& context) {
 	auto loader = rr::Resources::Loader{context};
 	auto ret = rr::Resources{};
-	loader(ret.fonts.main, "fonts/main.ttf");
-	loader(ret.textures.background, "textures/floor_tile.jpg");
-	loader(ret.textures.cooker, "textures/cooker.png");
-	loader(ret.textures.health, "textures/heart.png");
-	loader(ret.animations.player, "animations/player.anim");
-	loader(ret.animations.explode, "animations/explode.anim");
-	loader(ret.sfx.tick_tock, "sfx/tick_tock.wav");
-	loader(ret.sfx.explode, "sfx/explode.wav");
-	loader(ret.sfx.collect, "sfx/beep.wav");
-	loader(ret.sfx.power_up, "sfx/power_up.wav");
+	if (!loader(ret, "manifest.txt")) { logger::warn("Failed to load game resources!"); }
 	return ret;
 }
 
 void run(rr::Context context) {
 	auto resources = load_resources(context);
 	auto game = rr::Game{context, resources};
-	// game.audio().set_sfx_gain(0.2f);
 	auto debug = DebugControls{};
 	debug.game = &game;
 

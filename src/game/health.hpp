@@ -17,6 +17,13 @@ class Health {
 		return false;
 	}
 
+	constexpr Health& heal(int delta, int max_hp) {
+		hp += delta;
+		if (hp > max_hp) { hp = max_hp; }
+		make_normal();
+		return *this;
+	}
+
 	constexpr Health& make_immune() {
 		m_state = State::eImmune;
 		m_immune_for = immune;

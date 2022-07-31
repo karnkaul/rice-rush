@@ -1,7 +1,7 @@
 #include <engine/animated_sprite.hpp>
 
 namespace rr {
-AnimatedSprite& AnimatedSprite::set_sheet(Sprite::Sheet const& sheet, IndexTimeline::Sequence sequence) {
+AnimatedSprite& AnimatedSprite::set_sheet(Sprite::Sheet const& sheet, Sequence sequence) {
 	Sprite::set_sheet(&sheet);
 	timeline.set(sequence);
 	return *this;

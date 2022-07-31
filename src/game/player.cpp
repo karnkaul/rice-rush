@@ -60,7 +60,7 @@ void Player::hit() {
 }
 
 void Player::heal(int hp) {
-	m_state.health.hp = std::min(m_state.health.hp + hp, max_hp);
+	m_state.health.heal(hp, max_hp);
 	logger::debug("[Player] heal: {}; hp: {}", hp, m_state.health.hp);
 }
 

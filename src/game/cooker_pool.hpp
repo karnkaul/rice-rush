@@ -26,6 +26,8 @@ class CookerPool : public GameObject {
 
 	void set_prefab(Prefab prefab);
 	void spawn(Cooker const& cooker);
+	std::size_t sweep_ready();
+
 	Prefab const& prefab() const { return m_prefab; }
 	bool intersecting(Trigger const& trigger) const;
 

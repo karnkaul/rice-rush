@@ -10,8 +10,11 @@ namespace rr {
 struct Context;
 
 struct SheetAnimation {
+	using Sequence = IndexTimeline::Sequence;
+
+	vf::Texture texture{};
 	Sprite::Sheet sheet{};
-	IndexTimeline::Sequence sequence{};
+	Sequence sequence{};
 };
 
 struct Resources {
@@ -23,6 +26,12 @@ struct Resources {
 		vf::Texture background{};
 		vf::Texture health{};
 		vf::Texture cooker{};
+
+		struct {
+			vf::Texture heal{};
+			vf::Texture slomo{};
+			vf::Texture sweep{};
+		} powerups{};
 	} textures{};
 
 	struct {
@@ -34,7 +43,7 @@ struct Resources {
 		capo::Sound tick_tock{};
 		capo::Sound explode{};
 		capo::Sound collect{};
-		capo::Sound power_up{};
+		capo::Sound powerup{};
 	} sfx{};
 
 	struct Loader;
@@ -45,10 +54,9 @@ struct Resources::Loader {
 
 	bool operator()(vf::Ttf& out, std::string_view uri) const;
 	bool operator()(vf::Texture& out, std::string_view uri, Ptr<vf::TextureCreateInfo const> info = {}) const;
-
-	bool operator()(Sprite::Sheet& out, std::string_view uri) const;
 	bool operator()(SheetAnimation& out_anim, std::string_view uri) const;
-
 	bool operator()(capo::Sound& out, std::string_view uri) const;
+
+	bool operator()(Resources& out, std::string_view uri) const;
 };
 } // namespace rr

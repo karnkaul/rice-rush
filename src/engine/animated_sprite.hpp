@@ -5,12 +5,14 @@
 namespace rr {
 class AnimatedSprite : public Sprite {
   public:
+	using Sequence = IndexTimeline::Sequence;
+
 	AnimatedSprite() = default;
 	AnimatedSprite(Context const& context, std::string name = "animated_sprite") : Sprite(context, std::move(name)) {}
 
 	IndexTimeline timeline{};
 
-	AnimatedSprite& set_sheet(Sprite::Sheet const& sheet, IndexTimeline::Sequence sequence);
+	AnimatedSprite& set_sheet(Sprite::Sheet const& sheet, Sequence sequence);
 	AnimatedSprite& set_sheet(Sprite::Sheet const& sheet, vf::Time duration);
 	AnimatedSprite& unset_sheet();
 

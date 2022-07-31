@@ -11,7 +11,7 @@ struct SheetInfo {
 	glm::ivec2 tile_count{};
 };
 
-SheetInfo get_sprite_info(std::istream& in, Ptr<IndexTimeline::Sequence> sequence = {}) {
+SheetInfo get_sheet_info(std::istream& in, Ptr<SheetAnimation::Sequence> sequence = {}) {
 	auto parser = util::Property::Parser{in};
 	auto ret = SheetInfo{};
 	parser.parse_all([&](util::Property property) {
@@ -23,10 +23,10 @@ SheetInfo get_sprite_info(std::istream& in, Ptr<IndexTimeline::Sequence> sequenc
 			ret.tile_count.y = std::atoi(property.value.c_str());
 		} else if (property.key == "duration" && sequence) {
 			sequence->duration = vf::Time(std::atof(property.value.c_str()));
-		} else if (property.key == "begin" && sequence) {
+		} else if (sequence && property.key == "begin") {
 			auto begin = std::atoi(property.value.c_str());
 			if (begin >= 0) { sequence->begin = static_cast<std::size_t>(begin); }
-		} else if (property.key == "end" && sequence) {
+		} else if (sequence && property.key == "end") {
 			auto end = std::atoi(property.value.c_str());
 			if (end >= 0) { sequence->end = static_cast<std::size_t>(end); }
 		}
@@ -65,26 +65,6 @@ bool load(vf::Image& out, char const* path) {
 	}
 	return true;
 }
-
-bool load(Context const& context, Sprite::Sheet& out_sheet, std::string_view uri, IndexTimeline::Sequence* out_sequence) {
-	auto file = std::ifstream(data_path(context.env, uri));
-	if (!file) {
-		logger::warn("[Resources] Failed to load Sprite::Sheet: [{}]", uri);
-		return false;
-	}
-	auto const info = get_sprite_info(file, out_sequence);
-	if (!validate(info, uri)) { return false; }
-	if (out_sequence && !validate(*out_sequence, uri)) { return false; }
-
-	auto image = vf::Image{};
-	if (!load(image, data_path(context.env, info.image_uri).c_str())) { return false; }
-	out_sheet.set_texture(vf::Texture(context.vf_context, std::string(uri), image));
-	out_sheet.set_uvs(static_cast<std::size_t>(info.tile_count.y), static_cast<std::size_t>(info.tile_count.x));
-	if (out_sequence && out_sequence->end <= out_sequence->begin) { out_sequence->end = out_sheet.uv_count(); }
-
-	logger::debug("[Resources] Sprite::Sheet [{}] loaded", uri);
-	return true;
-}
 } // namespace
 
 bool Resources::Loader::operator()(vf::Ttf& out, std::string_view uri) const {
@@ -117,8 +97,26 @@ bool Resources::Loader::operator()(vf::Texture& out, std::string_view uri, Ptr<v
 	return true;
 }
 
-bool Resources::Loader::operator()(Sprite::Sheet& out_sheet, std::string_view uri) const { return load(context, out_sheet, uri, {}); }
-bool Resources::Loader::operator()(SheetAnimation& out_anim, std::string_view uri) const { return load(context, out_anim.sheet, uri, &out_anim.sequence); }
+bool Resources::Loader::operator()(SheetAnimation& out_anim, std::string_view uri) const {
+	auto file = std::ifstream(data_path(context.env, uri));
+	if (!file) {
+		logger::warn("[Resources] Failed to load Sprite::Sheet: [{}]", uri);
+		return false;
+	}
+	auto const info = get_sheet_info(file, &out_anim.sequence);
+	if (!validate(info, uri)) { return false; }
+	if (!validate(out_anim.sequence, uri)) { return false; }
+
+	auto image = vf::Image{};
+	if (!load(image, data_path(context.env, info.image_uri).c_str())) { return false; }
+	out_anim.texture = vf::Texture(context.vf_context, std::string(uri), image);
+	out_anim.sheet = &out_anim.texture;
+	out_anim.sheet.set_uvs(static_cast<std::size_t>(info.tile_count.y), static_cast<std::size_t>(info.tile_count.x));
+	if (out_anim.sequence.end <= out_anim.sequence.begin) { out_anim.sequence.end = out_anim.sheet.uv_count(); }
+
+	logger::debug("[Resources] Sprite::Sheet [{}] loaded", uri);
+	return true;
+}
 
 bool Resources::Loader::operator()(capo::Sound& out, std::string_view uri) const {
 	auto pcm = capo::PCM::from_file(data_path(context.env, uri));
@@ -128,6 +126,49 @@ bool Resources::Loader::operator()(capo::Sound& out, std::string_view uri) const
 	}
 	out = context.capo_instance->make_sound(*pcm);
 	logger::debug("[Resources] Sound [{}] loaded", uri);
+	return true;
+}
+
+bool Resources::Loader::operator()(Resources& out, std::string_view uri) const {
+	auto file = std::ifstream(data_path(context.env, uri));
+	if (!file) {
+		logger::warn("[Resources] Failed to open [{}]", uri);
+		return false;
+	}
+	auto parser = util::Property::Parser{file};
+	int count{};
+	parser.parse_all([&](util::Property property) {
+		if (property.key == "fonts/main") {
+			if (operator()(out.fonts.main, property.value)) { ++count; }
+		} else if (property.key == "textures/background") {
+			if (operator()(out.textures.background, property.value)) { ++count; }
+		} else if (property.key == "textures/health") {
+			if (operator()(out.textures.health, property.value)) { ++count; }
+		} else if (property.key == "textures/cooker") {
+			if (operator()(out.textures.cooker, property.value)) { ++count; }
+		} else if (property.key == "textures/powerups/heal") {
+			if (operator()(out.textures.powerups.heal, property.value)) { ++count; }
+		} else if (property.key == "textures/powerups/slomo") {
+			if (operator()(out.textures.powerups.slomo, property.value)) { ++count; }
+		} else if (property.key == "textures/powerups/sweep") {
+			if (operator()(out.textures.powerups.sweep, property.value)) { ++count; }
+		} else if (property.key == "animations/explode") {
+			if (operator()(out.animations.explode, property.value)) { ++count; }
+		} else if (property.key == "animations/player") {
+			if (operator()(out.animations.player, property.value)) { ++count; }
+		} else if (property.key == "sfx/tick_tock") {
+			if (operator()(out.sfx.tick_tock, property.value)) { ++count; }
+		} else if (property.key == "sfx/explode") {
+			if (operator()(out.sfx.explode, property.value)) { ++count; }
+		} else if (property.key == "sfx/collect") {
+			if (operator()(out.sfx.collect, property.value)) { ++count; }
+		} else if (property.key == "sfx/powerup") {
+			if (operator()(out.sfx.powerup, property.value)) { ++count; }
+		} else {
+			logger::warn("[Resources] Unrecognized key in [{}]: [{}]", uri, property.key);
+		}
+	});
+	logger::debug("[Resources] loaded [{}] assets from [{}]", count, uri);
 	return true;
 }
 } // namespace rr
