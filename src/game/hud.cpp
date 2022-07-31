@@ -11,6 +11,9 @@ void Hud::setup() {
 	auto& vfc = game()->context.vf_context;
 	m_health = {vfc, "health"};
 	m_score = {vfc, "score"};
+	m_over.title = {vfc, "over_title"};
+	m_over.high_score = {vfc, "over_score"};
+	m_over.restart = {vfc, "over_restart"};
 
 	auto& resources = game()->resources;
 	auto& hud = layout().hud;
@@ -31,6 +34,16 @@ void Hud::setup() {
 	}
 	m_health.gbo.write(vf::Geometry::makeQuad(vf::QuadCreateInfo{{his, his}}));
 	m_health.texture = game()->resources.textures.health.handle();
+
+	m_over.title.setFont(&resources.fonts.main).setHeight(static_cast<vf::Text::Height>(layout().play_area.extent.y * 0.2f));
+	m_over.high_score.setFont(&resources.fonts.main).setHeight(static_cast<vf::Text::Height>(layout().play_area.extent.y * 0.1f));
+	m_over.restart.setFont(&resources.fonts.main).setHeight(static_cast<vf::Text::Height>(layout().play_area.extent.y * 0.05f));
+	m_over.title.transform().position.y = layout().play_area.offset.y;
+	m_over.high_score.transform().position.y = layout().play_area.offset.y + 0.5f * layout().play_area.extent.y - 100.0f * basis().scale;
+	m_over.restart.transform().position.y = (0.5f * -basis().space.y + 50.0f) * basis().scale;
+	m_over.high_score.setString(ktl::kformat("HIGH SCORE\n{}", game()->high_score()));
+	m_over.title.setString("GAME OVER");
+	m_over.restart.setString("press [Enter / Start] to retry");
 
 	if constexpr (debug_v) {
 		m_debug = {vfc, "debug"};
@@ -69,10 +82,21 @@ void Hud::tick(DeltaTime dt) {
 		m_health.instances[i].transform.scale = {health_lost_scale, health_lost_scale};
 	}
 
+	if (auto high_score = game()->high_score(); m_high_score != high_score) {
+		m_over.high_score.setString(ktl::kformat("HIGH SCORE\n{}", high_score));
+		m_high_score = high_score;
+	}
+
 	if constexpr (debug_v) { m_debug.setString(ktl::kformat("{} FPS\t{}", game()->framerate().fps(), util::format_elapsed(game()->elapsed()))); }
 }
 
 void Hud::draw(vf::Frame const& frame) const {
+	if (game()->state() == Game::State::eOver) {
+		frame.draw(m_over.title);
+		frame.draw(m_over.restart);
+		frame.draw(m_over.high_score);
+	}
+
 	frame.draw(m_background);
 	frame.draw(m_health);
 	frame.draw(m_score);

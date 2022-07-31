@@ -26,6 +26,7 @@ bool set_state(vf::Gamepad::Id const id, Controller::State& out, Controller::Fla
 		out.xy.x = debounce(gamepad(vf::GamepadAxis::eLeftX));
 		out.xy.y = debounce(gamepad(vf::GamepadAxis::eLeftY));
 		update(out.flags, cache, Flag::eInteract, gamepad(vf::GamepadButton::eA));
+		update(out.flags, cache, Flag::eStart, gamepad(vf::GamepadButton::eStart));
 		return non_empty(out);
 	}
 	return false;
@@ -37,6 +38,7 @@ bool set_state(Keyboard const& keyboard, Controller::State& out, Controller::Fla
 	if (keyboard.pressed(vf::Key::eD) || keyboard.pressed(vf::Key::eRight)) { out.xy.x += 1.0f; }
 	if (keyboard.pressed(vf::Key::eA) || keyboard.pressed(vf::Key::eLeft)) { out.xy.x -= 1.0f; }
 	update(out.flags, cache, Flag::eInteract, keyboard.pressed(vf::Key::eSpace));
+	update(out.flags, cache, Flag::eStart, keyboard.pressed(vf::Key::eEnter));
 	if (out.xy.x != 0.0f || out.xy.y != 0.0f) { out.xy = glm::normalize(out.xy); }
 	return non_empty(out);
 }

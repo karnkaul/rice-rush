@@ -11,12 +11,6 @@
 #include <algorithm>
 
 namespace rr {
-void CookerPool::set_prefab(Prefab prefab) {
-	m_prefab = prefab;
-	m_entries.mesh.gbo.write(vf::Geometry::makeQuad({prefab.size}));
-	m_entries.mesh.texture = prefab.texture;
-}
-
 void CookerPool::spawn(Cooker const& cooker) {
 	auto entry = Entry{};
 	entry.trigger = {cooker.position, triggerDiameter};
@@ -25,7 +19,7 @@ void CookerPool::spawn(Cooker const& cooker) {
 	entry.text = vf::Text(game()->context.vf_context, "cooker");
 	entry.text.setFont(&game()->resources.fonts.main).setHeight(textHeight).setString(util::format_elapsed(cooker.cook));
 	entry.text.transform().position = entry.trigger.centre;
-	entry.text.transform().position.y += 0.75f * m_prefab.size.y;
+	entry.text.transform().position.y += 0.75f * size.y;
 	entry.text.tint() = text_tint;
 
 	m_entries.add(cooker.position, std::move(entry));
@@ -43,7 +37,8 @@ bool CookerPool::intersecting(Trigger const& trigger) const {
 
 void CookerPool::setup() {
 	m_entries.mesh = {game()->context.vf_context, "cookers"};
-	m_entries.mesh.gbo.write(vf::Geometry::makeQuad());
+	m_entries.mesh.gbo.write(vf::Geometry::makeQuad({size * basis().scale}));
+	m_entries.mesh.texture = game()->resources.textures.cooker.handle();
 
 	m_sfx = game()->context.capo_instance->make_source();
 	m_sfx.loop(true);
@@ -77,8 +72,10 @@ void CookerPool::tick(DeltaTime dt) {
 
 void CookerPool::draw(vf::Frame const& frame) const {
 	m_entries.draw(frame);
-	for (auto const& entry : m_entries.entries) {
-		if (entry.t.cooker.cook <= 0s) { frame.draw(entry.t.text); }
+	if (game()->state() == Game::State::ePlay) {
+		for (auto const& entry : m_entries.entries) {
+			if (entry.t.cooker.cook <= 0s) { frame.draw(entry.t.text); }
+		}
 	}
 }
 

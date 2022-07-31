@@ -10,7 +10,7 @@ class Controller {
   public:
 	enum class Type { eKeyboard, eGamepad };
 
-	enum class Flag { eInteract };
+	enum class Flag { eInteract, eStart };
 	using Flags = ktl::enum_flags<Flag, std::uint8_t>;
 
 	struct State {

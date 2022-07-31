@@ -19,18 +19,12 @@ class CookerPool : public GameObject {
 		Points points{10};
 	};
 
-	struct Prefab {
-		glm::vec2 size{100.0f};
-		vf::TextureHandle texture{};
-	};
-
-	void set_prefab(Prefab prefab);
 	void spawn(Cooker const& cooker);
 	std::size_t sweep_ready();
 
-	Prefab const& prefab() const { return m_prefab; }
 	bool intersecting(Trigger const& trigger) const;
 
+	glm::vec2 size{100.0f};
 	vf::Text::Height textHeight{36};
 	float triggerDiameter{150.0f};
 	vf::Time vibrate{0.1s};
@@ -55,7 +49,6 @@ class CookerPool : public GameObject {
 	void pop(Instanced<Entry>::Entry& entry);
 
 	Instanced<Entry> m_entries{};
-	Prefab m_prefab{};
 	capo::Source m_sfx{};
 	Ptr<ExplodePool> m_explode_pool{};
 };

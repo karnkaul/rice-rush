@@ -22,6 +22,7 @@ class Pawn;
 class CookerPool;
 class Hud;
 class Background;
+class Powerup;
 
 class Game;
 
@@ -65,6 +66,7 @@ class Game {
 	Player& player() const { return *m_player; }
 	Ptr<CookerPool> cooker_pool() const { return m_cooker_pool; }
 	Ptr<Background> background() const { return m_background.get(); }
+	Ptr<Powerup> powerup() const { return m_powerup; }
 	float sfx_gain() const;
 
 	vf::Time elapsed() const { return m_state.elapsed; }
@@ -76,6 +78,7 @@ class Game {
 
 	void set(State state);
 	State state() const { return m_state.state; }
+	std::uint64_t high_score() const;
 
   private:
 	void on_key(vf::KeyEvent const& key);
@@ -100,6 +103,7 @@ class Game {
 	ktl::kunique_ptr<Background> m_background{};
 	Ptr<CookerPool> m_cooker_pool{};
 	Ptr<Hud> m_hud{};
+	Ptr<Powerup> m_powerup{};
 	Framerate m_framerate{};
 };
 } // namespace rr

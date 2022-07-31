@@ -17,6 +17,12 @@ class Hud final : public GameObject {
 	void tick(DeltaTime dt) override;
 	void draw(vf::Frame const& frame) const override;
 
+	struct {
+		vf::Text title{};
+		vf::Text high_score{};
+		vf::Text restart{};
+	} m_over{};
+
 	vf::Mesh m_background{};
 	vf::InstancedMesh<> m_health{};
 	vf::Text m_score{};
@@ -24,5 +30,6 @@ class Hud final : public GameObject {
 
 	vf::Time m_hurt_elapsed{};
 	bool m_hurt_pulse_up{};
+	std::uint64_t m_high_score{};
 };
 } // namespace rr

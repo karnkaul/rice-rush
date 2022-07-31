@@ -64,7 +64,7 @@ struct DebugControls : rr::KeyListener {
 		auto const zone = 0.5f * game->layout.play_area.extent;
 		auto const offset = +game->layout.play_area.offset;
 		if (key(vf::Key::eEnter, vf::Action::ePress)) {
-			auto const cooker_size = game->cooker_pool()->prefab().size;
+			auto const cooker_size = game->cooker_pool()->size;
 			auto const cooker_zone = zone - 2.0f * cooker_size;
 			game->cooker_pool()->spawn({random_cooker_pos(cooker_zone, offset, *game->cooker_pool()), vf::Time(random_range(2.0f, 5.0f))});
 		}
@@ -105,9 +105,7 @@ void run(rr::Context context) {
 	}
 
 	game.set(rr::Game::State::ePlay);
-	debug.powerup = game.spawn<rr::Powerup>();
-	auto const cooker_size = game.layout.basis.scale * glm::vec2{100.0f};
-	game.cooker_pool()->set_prefab({cooker_size, resources.textures.cooker.handle()});
+	debug.powerup = game.powerup();
 
 	context.vf_context.show();
 	while (!context.vf_context.closing()) {

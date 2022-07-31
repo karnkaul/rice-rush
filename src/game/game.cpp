@@ -6,6 +6,7 @@
 #include <game/game.hpp>
 #include <game/hud.hpp>
 #include <game/player.hpp>
+#include <game/powerup.hpp>
 #include <game/resources.hpp>
 #include <util/logger.hpp>
 #include <algorithm>
@@ -19,6 +20,7 @@ struct Game::Impl {
 	Audio audio{};
 	std::vector<Ptr<KeyListener>> listeners{};
 	std::vector<Ptr<GameObject const>> draw_list{};
+	std::uint64_t high_score{};
 
 	Impl(Context& context) : trigger_renderer(context) {}
 };
@@ -84,8 +86,8 @@ void Game::tick(vf::Time dt) {
 	m_impl->audio.set_sfx_gain(context.config.sfx_gain);
 	transfer_spawned();
 	auto const dlt = DeltaTime{.real = dt, .scaled = dt * time_scale};
+	tick(player(), dlt);
 	if (m_state.state == State::ePlay) {
-		tick(player(), dlt);
 		if (player().health().hp <= 0) { set(State::eOver); }
 	}
 	tick(m_state.objects, dlt);
@@ -113,6 +115,7 @@ void Game::set(State state) {
 	case State::eOver: {
 		m_state.state = state;
 		logger::info("[Game] over; score: {}", player().score());
+		m_impl->high_score = std::max(m_impl->high_score, player().score());
 		break;
 	}
 	case State::ePlay: {
@@ -121,12 +124,15 @@ void Game::set(State state) {
 		m_player->reset();
 		m_cooker_pool = spawn<CookerPool>();
 		m_hud = spawn<Hud>();
+		m_powerup = spawn<Powerup>();
 		logger::info("[Game] play");
 		break;
 	}
 	default: break;
 	}
 }
+
+std::uint64_t Game::high_score() const { return m_impl->high_score; }
 
 void Game::on_key(vf::KeyEvent const& key) {
 	for (auto* listener : m_impl->listeners) { (*listener)(key); }
