@@ -3,6 +3,7 @@
 #include <engine/trigger_renderer.hpp>
 #include <game/background.hpp>
 #include <game/cooker_pool.hpp>
+#include <game/director.hpp>
 #include <game/game.hpp>
 #include <game/hud.hpp>
 #include <game/player.hpp>
@@ -141,6 +142,7 @@ void Game::set(State state) {
 		m_cooker_pool = spawn<CookerPool>();
 		m_hud = spawn<Hud>();
 		m_powerup = spawn<Powerup>();
+		spawn<Director>();
 		logger::info("[Game] play");
 		break;
 	}

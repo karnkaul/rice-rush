@@ -11,9 +11,19 @@
 #include <algorithm>
 
 namespace rr {
+glm::vec2 CookerPool::random_position(int max_tries) const {
+	auto const offset = game()->layout.play_area.offset;
+	auto const zone = 0.5f * game()->layout.play_area.extent - 2.0f * size;
+
+	auto make_pos = [zone, offset] { return util::random_range(-zone, zone) + offset; };
+	auto pos = make_pos();
+	for (int loops{}; loops < max_tries && intersecting(rr::Trigger{pos, trigger_diameter}); ++loops) { pos = make_pos(); }
+	return pos;
+}
+
 void CookerPool::spawn(Cooker const& cooker) {
 	auto entry = Entry{};
-	entry.trigger = {cooker.position, triggerDiameter};
+	entry.trigger = {cooker.position, trigger_diameter};
 	entry.cooker = cooker;
 
 	entry.text = vf::Text(game()->context.vf_context, "cooker");
@@ -23,6 +33,12 @@ void CookerPool::spawn(Cooker const& cooker) {
 	entry.text.tint() = text_tint;
 
 	m_entries.add(cooker.position, std::move(entry));
+}
+
+void CookerPool::spawn() {
+	auto const cook = util::random_range(ranges.cook.first, ranges.cook.second);
+	auto const ready = util::random_range(ranges.ready.first, ranges.ready.second);
+	spawn(Cooker{random_position(), cook, ready});
 }
 
 std::size_t CookerPool::sweep_ready() {

@@ -15,13 +15,14 @@ class Powerup : public GameObject {
 	bool activate_slowmo(float time_scale, vf::Time duration = 2s);
 	bool activate_heal(int hp);
 
-	float diameter{50.0f};
 	struct {
-		vf::Time spawn{3s};
-		vf::Time effect{2s};
+		vf::Time spawn{5s};
+		vf::Time effect{5s};
 	} ttl{};
 	float squish_coeff{0.05f};
 	float squish_rate{10.0f};
+	float diameter{50.0f};
+	std::uint32_t points{20};
 
 	struct Modifier {
 		virtual ~Modifier() = default;

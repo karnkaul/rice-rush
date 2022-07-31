@@ -166,6 +166,7 @@ void Powerup::update_active(vf::Time dt) {
 		} else {
 			m_active.effect = true;
 		}
+		game()->player().collect(points, false);
 		return;
 	}
 

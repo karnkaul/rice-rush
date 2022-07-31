@@ -20,7 +20,6 @@ std::optional<rr::Context> make_context(int argc, char const* const argv[]) {
 	auto config = rr::Config::load(env, "config.txt");
 	auto builder = vf::Builder{};
 	builder.setExtent(config.extent).setAntiAliasing(config.antiAliasing);
-	// builder.setExtent({1920, 1080});
 	auto vf = builder.build();
 	if (!vf) {
 		logger::error("Failed to create vulkify instance");
@@ -38,21 +37,13 @@ std::optional<rr::Context> make_context(int argc, char const* const argv[]) {
 	return ret;
 }
 
-// template <typename T>
-// [[maybe_unused]] void loadAllFrom(rr::World& world, rr::Collection<T>& out, std::string_view dir, std::string_view ext) {
-// 	for (auto& file : rr::fileList(world.context().env, dir, ext)) {
-// 		T t;
-// 		if (world.load(t, file)) { out.push(std::move(t)); }
-// 	}
-// }
-
 using rr::util::random_range;
 
 template <int MaxIter = 100>
 glm::vec2 random_cooker_pos(glm::vec2 const zone, glm::vec2 const offset, rr::CookerPool const& pool) {
 	auto make_pos = [zone, offset] { return random_range(-zone, zone) + offset; };
 	auto pos = make_pos();
-	for (int loops{}; loops < MaxIter && pool.intersecting(rr::Trigger{pos, pool.triggerDiameter}); ++loops) { pos = make_pos(); }
+	for (int loops{}; loops < MaxIter && pool.intersecting(rr::Trigger{pos, pool.trigger_diameter}); ++loops) { pos = make_pos(); }
 	return pos;
 }
 
@@ -61,20 +52,14 @@ struct DebugControls : rr::KeyListener {
 	rr::Ptr<rr::Powerup> powerup{};
 
 	void operator()(vf::KeyEvent const& key) override {
-		auto const zone = 0.5f * game->layout.play_area.extent;
-		auto const offset = +game->layout.play_area.offset;
-		if (key(vf::Key::eEnter, vf::Action::ePress)) {
-			auto const cooker_size = game->cooker_pool()->size;
-			auto const cooker_zone = zone - 2.0f * cooker_size;
-			game->cooker_pool()->spawn({random_cooker_pos(cooker_zone, offset, *game->cooker_pool()), vf::Time(random_range(2.0f, 5.0f))});
-		}
+		if (key(vf::Key::eEnter, vf::Action::ePress)) { game->cooker_pool()->spawn(); }
 		if (key(vf::Key::eBackslash, vf::Action::ePress) && powerup) {
 			if (powerup->active()) {
 				powerup->deactivate();
 			} else {
-				// powerup->activate_heal(1);
+				powerup->activate_heal(1);
 				// powerup->activate_slowmo(0.5f);
-				powerup->activate_sweep();
+				// powerup->activate_sweep();
 			}
 		}
 		if (key(vf::Key::eT, vf::Action::eRelease, vf::Mod::eCtrl)) { game->flags.flip(rr::Game::Flag::eRenderTriggers); }

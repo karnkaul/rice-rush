@@ -19,14 +19,22 @@ class CookerPool : public GameObject {
 		Points points{10};
 	};
 
+	glm::vec2 random_position(int max_tries = 100) const;
 	void spawn(Cooker const& cooker);
+	void spawn();
 	std::size_t sweep_ready();
+	std::size_t count() const { return m_entries.entries.size(); }
 
 	bool intersecting(Trigger const& trigger) const;
 
+	struct {
+		std::pair<vf::Time, vf::Time> cook{3s, 6s};
+		std::pair<vf::Time, vf::Time> ready{3s, 4s};
+	} ranges{};
+
 	glm::vec2 size{100.0f};
 	vf::Text::Height textHeight{36};
-	float triggerDiameter{150.0f};
+	float trigger_diameter{150.0f};
 	vf::Time vibrate{0.1s};
 	vf::Rgba text_tint{vf::white_v};
 
