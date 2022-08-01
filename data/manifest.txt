@@ -1,0 +1,25 @@
+# resource manifest
+#   maps in-game assets to resource URIs (relative path from data/)
+
+# fonts
+fonts/main = fonts/radis_sans.otf
+
+# textures
+textures/background = textures/floor_tile.jpg
+textures/health = textures/heart.png
+textures/cooker = textures/rice_cooker.png
+
+## powerups
+textures/powerups/heal = textures/heart.png
+textures/powerups/slomo = textures/clock.png
+textures/powerups/sweep = textures/star.png
+
+# animations
+animations/player = animations/player.txt
+animations/explode = animations/explode.txt
+
+# sfx
+sfx/tick_tock = sfx/tick_tock.wav
+sfx/explode = sfx/explode.wav
+sfx/collect = sfx/beep.wav
+sfx/powerup = sfx/power_up.wav

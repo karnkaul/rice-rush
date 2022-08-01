@@ -1,0 +1,13 @@
+fonts/radis_sans.otf https://fontlibrary.org/en/font/radis-sans#Radis%20Sans-Regular
+
+sfx/beep.wav https://freesound.org/people/PaulMorek/sounds/330068/
+sfx/explode.wav https://freesound.org/people/CGEffex/sounds/92643/
+sfx/tick_tock.wav https://freesound.org/people/FoolBoyMedia/sounds/264498/
+sfx/power_up.wav https://freesound.org/people/pan14/sounds/263133/
+
+textures/clock.png https://www.pngrepo.com/svg/250581/alarm-clock
+textures/explode.png https://www.vectorstock.com/royalty-free-vector/cartoon-explosion-sprite-sheet-animation-design-vector-22366976
+textures/floor_tile.jpg https://opengameart.org/content/wooden-floortile-seamless-with-normalmap
+textures/player.png https://craftpix.net/freebies/free-3-character-sprite-sheets-pixel-art/
+textures/rice_cooker.png https://openclipart.org/detail/320341/simple-rice-cooker
+textures/star.png https://www.pngrepo.com/svg/5127/star

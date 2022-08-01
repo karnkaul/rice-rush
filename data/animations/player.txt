@@ -1,0 +1,9 @@
+# uri of sprite sheet texture image
+image = textures/player.png
+
+# columns, rows in sheet
+x = 6
+y = 1
+
+# length of one animation cycle
+duration = 0.3

@@ -1,0 +1,9 @@
+# uri of sprite sheet texture image
+image = textures/explode.png
+
+# columns, rows in sheet
+x = 3
+y = 3
+
+# length of one animation cycle
+duration = 0.3
