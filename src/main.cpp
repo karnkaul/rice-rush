@@ -19,7 +19,7 @@ std::optional<rr::Context> make_context(int argc, char const* const argv[]) {
 	auto env = rr::Env::make(argc, argv);
 	auto config = rr::Config::load(env, "config.txt");
 	auto builder = vf::Builder{};
-	builder.setExtent(config.extent).setAntiAliasing(config.antiAliasing).setVsyncs({config.vsync});
+	builder.setTitle("Rice Rush").setExtent(config.extent).setAntiAliasing(config.antiAliasing).setVsyncs({config.vsync});
 	auto vf = builder.build();
 	if (!vf) {
 		logger::error("Failed to create vulkify instance");
