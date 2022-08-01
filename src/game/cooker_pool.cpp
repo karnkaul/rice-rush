@@ -27,7 +27,7 @@ void CookerPool::spawn(Cooker const& cooker) {
 	entry.cooker = cooker;
 
 	entry.text = vf::Text(game()->context.vf_context, "cooker");
-	entry.text.setFont(&game()->resources.fonts.main).setHeight(textHeight).setString(util::format_elapsed(cooker.cook));
+	entry.text.setFont(&game()->resources.fonts.main).setHeight(text_height).setString(util::format_elapsed(cooker.cook));
 	entry.text.transform().position = entry.trigger.centre;
 	entry.text.transform().position.y += 0.75f * size.y;
 	entry.text.tint() = text_tint;
@@ -61,6 +61,10 @@ void CookerPool::setup() {
 	m_sfx.bind(game()->resources.sfx.tick_tock);
 
 	m_explode_pool = game()->spawn<ExplodePool>();
+
+	size *= basis().scale;
+	text_height = static_cast<vf::Text::Height>(static_cast<float>(text_height) * basis().scale);
+	trigger_diameter *= basis().scale;
 }
 
 void CookerPool::tick(DeltaTime dt) {

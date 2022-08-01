@@ -67,15 +67,18 @@ struct DebugControls : rr::KeyListener {
 	}
 };
 
-rr::Resources load_resources(rr::Context& context) {
+bool load_resources(rr::Resources& out, rr::Context& context) {
 	auto loader = rr::Resources::Loader{context};
-	auto ret = rr::Resources{};
-	if (!loader(ret, "manifest.txt")) { logger::warn("Failed to load game resources!"); }
-	return ret;
+	if (!loader(out, "manifest.txt")) {
+		logger::warn("Failed to load game resources!");
+		return false;
+	}
+	return true;
 }
 
 void run(rr::Context context) {
-	auto resources = load_resources(context);
+	auto resources = rr::Resources{};
+	load_resources(resources, context);
 	auto game = rr::Game{context, resources};
 	auto debug = DebugControls{};
 	debug.game = &game;

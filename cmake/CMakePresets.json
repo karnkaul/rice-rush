@@ -1,5 +1,5 @@
 {
-	"version": 2,
+	"version": 3,
 	"cmakeMinimumRequired": {
 		"major": 3,
 		"minor": 20,
@@ -76,66 +76,6 @@
 			"cacheVariables": {
 				"CMAKE_CXX_FLAGS": "-fsanitize=undefined"
 			}
-		}
-	],
-	"buildPresets": [
-		{
-			"name": "default",
-			"configurePreset": "default"
-		},
-		{
-			"name": "ninja-clang",
-			"configurePreset": "ninja-clang"
-		},
-		{
-			"name": "ninja-debug",
-			"configurePreset": "ninja-debug"
-		},
-		{
-			"name": "ninja-release",
-			"configurePreset": "ninja-release"
-		},
-		{
-			"name": "ninja-relw",
-			"configurePreset": "ninja-relw"
-		},
-		{
-			"name": "vs19",
-			"configurePreset": "vs22"
-		},
-		{
-			"name": "nc-ubsan",
-			"configurePreset": "nc-ubsan"
-		}
-	],
-	"testPresets": [
-		{
-			"name": "default",
-			"configurePreset": "default"
-		},
-		{
-			"name": "ninja-clang",
-			"configurePreset": "ninja-clang"
-		},
-		{
-			"name": "ninja-debug",
-			"configurePreset": "ninja-debug"
-		},
-		{
-			"name": "ninja-release",
-			"configurePreset": "ninja-release"
-		},
-		{
-			"name": "ninja-relw",
-			"configurePreset": "ninja-relw"
-		},
-		{
-			"name": "vs19",
-			"configurePreset": "vs22"
-		},
-		{
-			"name": "nc-ubsan",
-			"configurePreset": "nc-ubsan"
 		}
 	]
 }

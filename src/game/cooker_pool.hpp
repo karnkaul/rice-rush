@@ -33,7 +33,7 @@ class CookerPool : public GameObject {
 	} ranges{};
 
 	glm::vec2 size{100.0f};
-	vf::Text::Height textHeight{36};
+	vf::Text::Height text_height{36};
 	float trigger_diameter{150.0f};
 	vf::Time vibrate{0.1s};
 	vf::Rgba text_tint{vf::white_v};

@@ -8,7 +8,7 @@
 #include <span>
 
 namespace vf {
-class Event;
+struct Event;
 class Frame;
 } // namespace vf
 

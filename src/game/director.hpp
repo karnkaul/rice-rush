@@ -13,7 +13,7 @@ class Director : public GameObject {
 	};
 
 	struct {
-		capo::utils::EnumArray<PowerupType, std::uint32_t> weights{5, 3, 2};
+		capo::utils::EnumArray<PowerupType, std::uint32_t> weights{5U, 3U, 2U};
 		std::pair<vf::Time, vf::Time> respawn{10s, 60s};
 		float slowmo_scale{0.5f};
 	} m_powerup{};

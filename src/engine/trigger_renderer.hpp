@@ -8,7 +8,7 @@ class Frame;
 }
 
 namespace rr {
-class Context;
+struct Context;
 
 class TriggerRenderer {
   public:

@@ -68,7 +68,7 @@ void Player::reset(glm::vec2 const position) {
 	logger::debug("[Player] reset");
 	m_state = {};
 	auto const& anim = game()->resources.animations.player;
-	sprite.set_sheet(anim.sheet, anim.sequence).set_size(size * basis().scale);
+	sprite.set_sheet(anim.sheet, anim.sequence).set_size(size);
 	sprite.instance().transform.position = trigger.centre = position;
 	sprite.instance().transform.scale = glm::vec2{1.0f};
 }
@@ -76,6 +76,9 @@ void Player::reset(glm::vec2 const position) {
 void Player::setup() {
 	sprite = AnimatedSprite(game()->context, "player");
 	layer = layers::player;
+
+	size *= basis().scale;
+	trigger.diameter *= basis().scale;
 }
 
 void Player::tick(DeltaTime dt) {

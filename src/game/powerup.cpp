@@ -116,8 +116,9 @@ void Powerup::deactivate() {
 
 void Powerup::setup() {
 	m_sprite = AnimatedSprite(game()->context, "powerup");
-	diameter *= basis().scale;
 	layer = layers::powerup;
+
+	diameter *= basis().scale;
 }
 
 void Powerup::tick(DeltaTime dt) {

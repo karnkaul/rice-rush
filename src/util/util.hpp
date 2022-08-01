@@ -6,7 +6,7 @@ class Texture;
 }
 
 namespace rr {
-class Context;
+struct Context;
 
 namespace util {
 std::string format_elapsed(vf::Time elapsed);

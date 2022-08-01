@@ -11,6 +11,7 @@ Property Property::Parser::next() {
 	if (!in) { return {}; }
 	auto line = std::string{};
 	std::getline(in, line);
+	if (line.empty()) { return next(); }
 	if (line.front() == '#') { return next(); }
 	auto const eq = line.find('=');
 	if (eq == std::string::npos) { return next(); }
