@@ -27,7 +27,7 @@ void CookerPool::spawn(Cooker const& cooker) {
 	entry.cooker = cooker;
 
 	entry.text = vf::Text(game()->context.vf_context, "cooker");
-	entry.text.setFont(&game()->resources.fonts.main).setHeight(text_height).setString(util::format_elapsed(cooker.cook));
+	entry.text.set_font(&game()->resources.fonts.main).set_height(text_height).set_string(util::format_elapsed(cooker.cook));
 	entry.text.transform().position = entry.trigger.centre;
 	entry.text.transform().position.y += 0.75f * size.y;
 	entry.text.tint() = text_tint;
@@ -53,7 +53,7 @@ bool CookerPool::intersecting(Trigger const& trigger) const {
 
 void CookerPool::setup() {
 	m_entries.mesh = {game()->context.vf_context, "cookers"};
-	m_entries.mesh.gbo.write(vf::Geometry::makeQuad({size * basis().scale}));
+	m_entries.mesh.gbo.write(vf::Geometry::make_quad({size * basis().scale}));
 	m_entries.mesh.texture = game()->resources.textures.cooker.handle();
 
 	m_sfx = game()->context.capo_instance->make_source();
@@ -132,7 +132,7 @@ auto CookerPool::update_and_get_nearest(Trigger& player, vf::Time dt) -> Ptr<Ins
 			entry.t.vibrateRemain -= dt;
 			entry.t.cooker.ready -= dt;
 			entry.instance.tint = vf::Rgba::make(0xffffccff).linear();
-			entry.t.text.setString(util::format_elapsed(entry.t.cooker.ready));
+			entry.t.text.set_string(util::format_elapsed(entry.t.cooker.ready));
 		}
 	}
 

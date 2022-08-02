@@ -58,8 +58,23 @@ bool validate(IndexTimeline::Sequence const& sequence, std::string_view const ur
 	return true;
 }
 
+std::vector<std::byte> read_file(char const* path) {
+	if (auto in = std::ifstream(path, std::ios::binary | std::ios::ate)) {
+		in.unsetf(std::ios::skipws);
+		auto const size = in.tellg();
+		auto buf = std::vector<std::byte>(static_cast<std::size_t>(size));
+		in.seekg(0, std::ios::beg);
+		in.read(reinterpret_cast<char*>(buf.data()), size);
+		return buf;
+	}
+	return {};
+}
+
+std::vector<std::byte> read_file(Env const& env, std::string_view uri) { return read_file(data_path(env, uri).c_str()); }
+
 bool load(vf::Image& out, char const* path) {
-	if (!out.load(path)) {
+	auto bytes = read_file(path);
+	if (!out.load(vf::Image::Encoded{bytes})) {
 		logger::warn("[Resources] Failed to open image: [{}]", path);
 		return false;
 	}
@@ -69,13 +84,13 @@ bool load(vf::Image& out, char const* path) {
 
 bool Resources::Loader::operator()(vf::Ttf& out, std::string_view uri) const {
 	if (!out) { out = vf::Ttf(context.vf_context, std::string(uri)); }
-	if (out.load(data_path(context.env, uri).c_str())) {
-		logger::debug("[Resources] Ttf [{}] loaded", uri);
-		return true;
-	} else {
+	auto bytes = read_file(context.env, uri);
+	if (!out.load(bytes)) {
 		logger::warn("[Resources] Failed to load Ttf: [{}]", uri);
 		return false;
 	}
+	logger::debug("[Resources] Ttf [{}] loaded", uri);
+	return true;
 }
 
 bool Resources::Loader::operator()(vf::Texture& out, std::string_view uri, Ptr<vf::TextureCreateInfo const> info) const {
@@ -98,12 +113,13 @@ bool Resources::Loader::operator()(vf::Texture& out, std::string_view uri, Ptr<v
 }
 
 bool Resources::Loader::operator()(SheetAnimation& out_anim, std::string_view uri) const {
-	auto file = std::ifstream(data_path(context.env, uri));
-	if (!file) {
+	auto bytes = read_file(context.env, uri);
+	if (bytes.empty()) {
 		logger::warn("[Resources] Failed to load Sprite::Sheet: [{}]", uri);
 		return false;
 	}
-	auto const info = get_sheet_info(file, &out_anim.sequence);
+	auto str = std::stringstream{reinterpret_cast<char const*>(bytes.data())};
+	auto const info = get_sheet_info(str, &out_anim.sequence);
 	if (!validate(info, uri)) { return false; }
 	if (!validate(out_anim.sequence, uri)) { return false; }
 
@@ -119,7 +135,12 @@ bool Resources::Loader::operator()(SheetAnimation& out_anim, std::string_view ur
 }
 
 bool Resources::Loader::operator()(capo::Sound& out, std::string_view uri) const {
-	auto pcm = capo::PCM::from_file(data_path(context.env, uri));
+	auto bytes = read_file(context.env, uri);
+	if (bytes.empty()) {
+		logger::warn("[Resources] Failed to load PCM: [{}]", uri);
+		return false;
+	}
+	auto pcm = capo::PCM::from_memory(bytes, capo::FileFormat::eUnknown);
 	if (!pcm) {
 		logger::warn("[Resources] Failed to load PCM: [{}]", uri);
 		return false;
@@ -130,12 +151,13 @@ bool Resources::Loader::operator()(capo::Sound& out, std::string_view uri) const
 }
 
 bool Resources::Loader::operator()(Resources& out, std::string_view uri) const {
-	auto file = std::ifstream(data_path(context.env, uri));
-	if (!file) {
-		logger::warn("[Resources] Failed to open [{}]", uri);
+	auto bytes = read_file(context.env, uri);
+	if (bytes.empty()) {
+		logger::warn("[Resources] Failed to load Sprite::Sheet: [{}]", uri);
 		return false;
 	}
-	auto parser = util::Property::Parser{file};
+	auto str = std::stringstream{reinterpret_cast<char const*>(bytes.data())};
+	auto parser = util::Property::Parser{str};
 	int count{};
 	parser.parse_all([&](util::Property property) {
 		if (property.key == "fonts/main") {

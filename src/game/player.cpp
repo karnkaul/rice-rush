@@ -30,8 +30,8 @@ Ptr<T> refresh(std::span<ktl::kunique_ptr<T> const> ts, Trigger& player) {
 }
 
 constexpr glm::vec2 clamp(glm::vec2 in, vf::Rect const& playArea, glm::vec2 const pad) {
-	auto const bl = playArea.bottomLeft() + pad;
-	auto const tr = playArea.topRight() - pad;
+	auto const bl = playArea.bottom_left() + pad;
+	auto const tr = playArea.top_right() - pad;
 	in.x = std::clamp(in.x, bl.x, tr.x);
 	in.y = std::clamp(in.y, bl.y, tr.y);
 	return in;

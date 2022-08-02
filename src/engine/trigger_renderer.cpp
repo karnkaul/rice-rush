@@ -7,7 +7,7 @@ void setup(Trigger const& trigger, vf::CircleShape& out) {
 	out.transform().position = trigger.centre;
 	out.tint() = trigger.interactable ? vf::red_v : vf::green_v;
 	out.tint().channels[3] = 0x77;
-	out.setState({.diameter = trigger.diameter});
+	out.set_state({.diameter = trigger.diameter});
 }
 } // namespace
 

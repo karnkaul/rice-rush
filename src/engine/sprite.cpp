@@ -54,7 +54,7 @@ auto Sprite::Sheet::set_uvs(std::size_t const rows, std::size_t const columns, g
 		for (std::size_t column = 0; column < columns; ++column) {
 			auto const tl = o + padf;
 			auto const br = tl + tile - padf;
-			add_uv(vf::UvRect{.topLeft = tl / extent, .bottomRight = br / extent});
+			add_uv(vf::UvRect{.top_left = tl / extent, .bottom_right = br / extent});
 			o.x += frame.x;
 		}
 		o.y += frame.y;

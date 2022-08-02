@@ -19,7 +19,7 @@ std::optional<rr::Context> make_context(int argc, char const* const argv[]) {
 	auto env = rr::Env::make(argc, argv);
 	auto config = rr::Config::load(env, "config.txt");
 	auto builder = vf::Builder{};
-	builder.setTitle("Rice Rush").setExtent(config.extent).setAntiAliasing(config.antiAliasing).setVsyncs({config.vsync});
+	builder.set_title("Rice Rush").set_extent(config.extent).set_anti_aliasing(config.antiAliasing).set_vsyncs({config.vsync});
 	auto vf = builder.build();
 	if (!vf) {
 		logger::error("Failed to create vulkify instance");
@@ -32,7 +32,7 @@ std::optional<rr::Context> make_context(int argc, char const* const argv[]) {
 		return {};
 	}
 	ret.config = std::move(config);
-	ret.basis.scale = ret.basis_scale(ret.vf_context.framebufferExtent());
+	ret.basis.scale = ret.basis_scale(ret.vf_context.framebuffer_extent());
 	ret.audio = *ret.capo_instance;
 	return ret;
 }

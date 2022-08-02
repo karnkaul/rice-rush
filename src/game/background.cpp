@@ -21,7 +21,7 @@ void Background::set_texture(vf::Texture const& texture, Layout const& layout, s
 	for (std::uint32_t i = 0; i < rows; ++i) {
 		xy.x = left;
 		for (std::uint32_t i = 0; i < columns; ++i) {
-			geometry.addQuad(vf::QuadCreateInfo{{width, height}, {xy}});
+			geometry.add_quad(vf::QuadCreateInfo{{width, height}, {xy}});
 			xy.x += width;
 		}
 		xy.y -= height;

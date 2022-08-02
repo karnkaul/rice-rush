@@ -19,12 +19,12 @@ void Hud::setup() {
 	auto& hud = layout().hud;
 
 	m_background = vf::Mesh(vfc, "hud_background");
-	m_background.gbo.write(vf::Geometry::makeQuad({hud.extent}));
+	m_background.gbo.write(vf::Geometry::make_quad({hud.extent}));
 	m_background.instance.transform.position = hud.offset;
 	m_background.instance.tint = bg_tint;
 
 	m_score.transform().position = layout().hud.offset;
-	m_score.setFont(&resources.fonts.main).setHeight(static_cast<vf::Text::Height>(hud.extent.y * 0.6f));
+	m_score.set_font(&resources.fonts.main).set_height(static_cast<vf::Text::Height>(hud.extent.y * 0.6f));
 
 	auto his = health_icon_size * basis().scale;
 	auto healthX = hud.offset.x + 0.5f * (-hud.extent.x + his) + his;
@@ -32,32 +32,32 @@ void Hud::setup() {
 		m_health.instances.push_back(vf::DrawInstance{vf::Transform{{healthX, hud.offset.y}}});
 		healthX += 2.0f * his;
 	}
-	m_health.gbo.write(vf::Geometry::makeQuad(vf::QuadCreateInfo{{his, his}}));
+	m_health.gbo.write(vf::Geometry::make_quad(vf::QuadCreateInfo{{his, his}}));
 	m_health.texture = game()->resources.textures.health.handle();
 
-	m_over.title.setFont(&resources.fonts.main).setHeight(static_cast<vf::Text::Height>(layout().play_area.extent.y * 0.2f));
-	m_over.high_score.setFont(&resources.fonts.main).setHeight(static_cast<vf::Text::Height>(layout().play_area.extent.y * 0.1f));
-	m_over.restart.setFont(&resources.fonts.main).setHeight(static_cast<vf::Text::Height>(layout().play_area.extent.y * 0.05f));
+	m_over.title.set_font(&resources.fonts.main).set_height(static_cast<vf::Text::Height>(layout().play_area.extent.y * 0.2f));
+	m_over.high_score.set_font(&resources.fonts.main).set_height(static_cast<vf::Text::Height>(layout().play_area.extent.y * 0.1f));
+	m_over.restart.set_font(&resources.fonts.main).set_height(static_cast<vf::Text::Height>(layout().play_area.extent.y * 0.05f));
 	m_over.title.transform().position.y = layout().play_area.offset.y;
 	m_over.high_score.transform().position.y = layout().play_area.offset.y + 0.5f * layout().play_area.extent.y - 100.0f * basis().scale;
 	m_over.restart.transform().position.y = (0.5f * -basis().space.y + 50.0f) * basis().scale;
-	m_over.high_score.setString(ktl::kformat("HIGH SCORE\n{}", game()->high_score()));
-	m_over.title.setString("GAME OVER");
-	m_over.restart.setString("press [Enter / Start] to retry");
+	m_over.high_score.set_string(ktl::kformat("HIGH SCORE\n{}", game()->high_score()));
+	m_over.title.set_string("GAME OVER");
+	m_over.restart.set_string("press [Enter / Start] to retry");
 
 	if constexpr (debug_v) {
 		m_debug = {vfc, "debug"};
 		m_debug.transform().position = {hud.offset.x + 0.5f * hud.extent.x - layout().basis.scale * 50.0f, hud.offset.y};
-		m_debug.setFont(&resources.fonts.main).setHeight(static_cast<vf::Text::Height>(hud.extent.y * 0.2f)).setAlign({vf::Text::Horz::eRight});
+		m_debug.set_font(&resources.fonts.main).set_height(static_cast<vf::Text::Height>(hud.extent.y * 0.2f)).set_align({vf::Text::Horz::eRight});
 	}
 }
 
 void Hud::tick(DeltaTime dt) {
 	auto const score = game()->player().score();
 	if (score == 0) {
-		m_score.setString("--");
+		m_score.set_string("--");
 	} else {
-		m_score.setString(ktl::kformat("{}", game()->player().score()));
+		m_score.set_string(ktl::kformat("{}", game()->player().score()));
 	}
 
 	auto const& health = game()->player().health();
@@ -83,11 +83,11 @@ void Hud::tick(DeltaTime dt) {
 	}
 
 	if (auto high_score = game()->high_score(); m_high_score != high_score) {
-		m_over.high_score.setString(ktl::kformat("HIGH SCORE\n{}", high_score));
+		m_over.high_score.set_string(ktl::kformat("HIGH SCORE\n{}", high_score));
 		m_high_score = high_score;
 	}
 
-	if constexpr (debug_v) { m_debug.setString(ktl::kformat("{} FPS\t{}", game()->framerate().fps(), util::format_elapsed(game()->elapsed()))); }
+	if constexpr (debug_v) { m_debug.set_string(ktl::kformat("{} FPS\t{}", game()->framerate().fps(), util::format_elapsed(game()->elapsed()))); }
 }
 
 void Hud::draw(vf::Frame const& frame) const {

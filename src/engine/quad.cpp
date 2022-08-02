@@ -4,7 +4,7 @@
 
 namespace rr {
 Quad::Quad(Context const& context, Info const& info, std::string name)
-	: m_mesh(vf::Mesh::makeQuad(context.vf_context, std::move(name), info.createInfo, info.texture)), m_info(info) {}
+	: m_mesh(vf::Mesh::make_quad(context.vf_context, std::move(name), info.createInfo, info.texture)), m_info(info) {}
 
 Quad& Quad::set_size(glm::vec2 size) {
 	m_info.createInfo.size = size;
@@ -22,7 +22,7 @@ Quad& Quad::set_texture(vf::TextureHandle const& texture) {
 }
 
 Quad& Quad::refresh() {
-	m_mesh.gbo.write(vf::Geometry::makeQuad(m_info.createInfo));
+	m_mesh.gbo.write(vf::Geometry::make_quad(m_info.createInfo));
 	return *this;
 }
 
