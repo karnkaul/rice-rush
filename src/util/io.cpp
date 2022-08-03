@@ -1,3 +1,4 @@
+#include <util/byte_array.hpp>
 #include <util/io.hpp>
 #include <util/logger.hpp>
 #include <physfs.h>
@@ -5,6 +6,7 @@
 #include <fstream>
 #include <optional>
 #include <ranges>
+#include <vector>
 
 namespace rr {
 namespace {
@@ -12,26 +14,23 @@ namespace fs = std::filesystem;
 
 std::vector<std::string> g_prefixes{};
 
-bool read_zip(std::vector<std::byte>& out, char const* uri) {
+bool read_zip(ByteArray& out, char const* uri) {
 	if (PHYSFS_exists(uri) == 0) { return false; }
 	auto file = PHYSFS_openRead(uri);
 	if (!file) { return false; }
-	auto const offset = out.size();
 	auto const length = PHYSFS_fileLength(file);
-	out.resize(out.size() + static_cast<std::size_t>(length));
-	PHYSFS_readBytes(file, out.data() + offset, static_cast<PHYSFS_uint64>(length));
+	PHYSFS_readBytes(file, out.data(), static_cast<PHYSFS_uint64>(length));
 	return true;
 }
 
-bool read_file(std::vector<std::byte>& out, char const* uri) {
+bool read_file(ByteArray& out, char const* uri) {
 	for (auto const& prefix : g_prefixes) {
 		if (auto in = std::ifstream((fs::path(prefix) / uri), std::ios::binary | std::ios::ate)) {
 			in.unsetf(std::ios::skipws);
 			auto const size = in.tellg();
-			auto const offset = out.size();
-			out.resize(out.size() + static_cast<std::size_t>(size));
+			out.resize_for_overwrite(static_cast<std::size_t>(size));
 			in.seekg(0, std::ios::beg);
-			in.read(reinterpret_cast<char*>(out.data() + offset), size);
+			in.read(reinterpret_cast<char*>(out.data()), size);
 			return true;
 		}
 	}
@@ -87,7 +86,7 @@ bool io::exists(char const* uri) {
 	return false;
 }
 
-bool io::load(std::vector<std::byte>& out, char const* uri) {
+bool io::load(ByteArray& out, char const* uri) {
 	if (read_zip(out, uri)) {
 		logger::debug("[zipfs] loaded [{}]", uri);
 		return true;

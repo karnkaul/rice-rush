@@ -76,6 +76,15 @@
 			"cacheVariables": {
 				"CMAKE_CXX_FLAGS": "-fsanitize=undefined"
 			}
+		},
+		{
+			"name": "ninja-asan",
+			"description": "UBSan debug build using Ninja",
+			"inherits": "ninja-debug",
+			"binaryDir": "out/asan",
+			"cacheVariables": {
+				"RR_ASAN": "ON"
+			}
 		}
 	]
 }

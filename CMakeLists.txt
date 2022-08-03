@@ -73,3 +73,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows" AND NOT CMAKE_CXX_COMPILER_ID STREQUAL G
     target_link_options(${PROJECT_NAME} PRIVATE -Wl,/SUBSYSTEM:$<IF:$<CONFIG:Debug>,CONSOLE,WINDOWS>,/ENTRY:mainCRTStartup)
   endif()
 endif()
+
+if(RR_ASAN)
+  target_compile_options(${PROJECT_NAME} PRIVATE -fsanitize=address)
+  target_link_options(${PROJECT_NAME} PRIVATE -fsanitize=address)
+endif()

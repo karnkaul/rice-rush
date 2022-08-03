@@ -59,7 +59,7 @@ bool validate(IndexTimeline::Sequence const& sequence, std::string_view const ur
 	return true;
 }
 
-bool load(std::vector<std::byte>& out_buffer, vf::Image& out, char const* uri) {
+bool load(ByteArray& out_buffer, vf::Image& out, char const* uri) {
 	if (!io::load(out_buffer, uri)) {
 		logger::warn("[Resources] Failed to read image: [{}]", uri);
 		return false;
@@ -74,7 +74,6 @@ bool load(std::vector<std::byte>& out_buffer, vf::Image& out, char const* uri) {
 
 bool Resources::Loader::operator()(vf::Ttf& out, char const* uri) {
 	if (!out) { out = vf::Ttf(context.vf_context, std::string(uri)); }
-	buffer.clear();
 	if (!io::load(buffer, uri)) {
 		logger::warn("[Resources] Failed to read Ttf: [{}]", uri);
 		return false;
@@ -87,7 +86,6 @@ bool Resources::Loader::operator()(vf::Ttf& out, char const* uri) {
 }
 
 bool Resources::Loader::operator()(vf::Texture& out, char const* uri, Ptr<vf::TextureCreateInfo const> info) {
-	buffer.clear();
 	auto image = vf::Image{};
 	if (!load(buffer, image, uri)) { return false; }
 	if (!out || info) {
@@ -106,13 +104,8 @@ bool Resources::Loader::operator()(vf::Texture& out, char const* uri, Ptr<vf::Te
 }
 
 bool Resources::Loader::operator()(SheetAnimation& out_anim, char const* uri) {
-	buffer.clear();
 	if (!io::load(buffer, uri)) {
 		logger::warn("[Resources] Failed to read sheet animation: [{}]", uri);
-		return false;
-	}
-	if (buffer.empty()) {
-		logger::warn("[Resources] Failed to load sheet animation: [{}]", uri);
 		return false;
 	}
 	auto str = std::stringstream{reinterpret_cast<char const*>(buffer.data())};
@@ -120,7 +113,6 @@ bool Resources::Loader::operator()(SheetAnimation& out_anim, char const* uri) {
 	if (!validate(info, uri)) { return false; }
 	if (!validate(out_anim.sequence, uri)) { return false; }
 
-	buffer.clear();
 	auto image = vf::Image{};
 	if (!load(buffer, image, info.image_uri.c_str())) { return false; }
 	out_anim.texture = vf::Texture(context.vf_context, std::string(uri), image);
@@ -132,13 +124,8 @@ bool Resources::Loader::operator()(SheetAnimation& out_anim, char const* uri) {
 }
 
 bool Resources::Loader::operator()(capo::Sound& out, char const* uri) {
-	buffer.clear();
 	if (!io::load(buffer, uri)) {
 		logger::warn("[Resources] Failed to read PCM: [{}]", uri);
-		return false;
-	}
-	if (buffer.empty()) {
-		logger::warn("[Resources] Failed to load PCM: [{}]", uri);
 		return false;
 	}
 	auto pcm = capo::PCM::from_memory(buffer, capo::FileFormat::eUnknown);
@@ -151,16 +138,11 @@ bool Resources::Loader::operator()(capo::Sound& out, char const* uri) {
 }
 
 bool Resources::Loader::operator()(Resources& out, char const* uri) {
-	buffer.clear();
 	if (!io::load(buffer, uri)) {
 		logger::warn("[Resources] Failed to read manifest: [{}]", uri);
 		return false;
 	}
-	if (buffer.empty()) {
-		logger::warn("[Resources] Failed to load manifest: [{}]", uri);
-		return false;
-	}
-	auto str = std::stringstream{reinterpret_cast<char const*>(buffer.data())};
+	auto str = std::stringstream{std::string(reinterpret_cast<char const*>(buffer.data()), buffer.size())};
 	auto parser = util::Property::Parser{str};
 	int count{};
 	parser.parse_all([&](util::Property property) {
