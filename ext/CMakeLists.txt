@@ -23,3 +23,12 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
 endif()
 
 FetchContent_MakeAvailable(vulkify)
+
+# physfs
+FetchContent_Declare(
+  physfs
+  GIT_REPOSITORY https://github.com/karnkaul/physfs
+  GIT_TAG 2d2bfb6
+  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/physfs"
+)
+FetchContent_MakeAvailable(physfs)

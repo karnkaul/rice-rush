@@ -51,12 +51,13 @@ struct Resources {
 
 struct Resources::Loader {
 	Context& context;
+	std::vector<std::byte> buffer{};
 
-	bool operator()(vf::Ttf& out, std::string_view uri) const;
-	bool operator()(vf::Texture& out, std::string_view uri, Ptr<vf::TextureCreateInfo const> info = {}) const;
-	bool operator()(SheetAnimation& out_anim, std::string_view uri) const;
-	bool operator()(capo::Sound& out, std::string_view uri) const;
+	bool operator()(vf::Ttf& out, char const* uri);
+	bool operator()(vf::Texture& out, char const* uri, Ptr<vf::TextureCreateInfo const> info = {});
+	bool operator()(SheetAnimation& out_anim, char const* uri);
+	bool operator()(capo::Sound& out, char const* uri);
 
-	bool operator()(Resources& out, std::string_view uri) const;
+	bool operator()(Resources& out, char const* uri);
 };
 } // namespace rr

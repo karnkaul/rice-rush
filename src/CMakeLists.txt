@@ -7,8 +7,6 @@ target_sources(${PROJECT_NAME} PRIVATE
   engine/config.hpp
   engine/context.hpp
   engine/delta_time.hpp
-  engine/env.cpp
-  engine/env.hpp
   engine/framerate.hpp
   engine/instanced.hpp
   engine/keyboard.hpp
@@ -55,6 +53,9 @@ target_sources(${PROJECT_NAME} PRIVATE
   util/random.hpp
   util/util.cpp
   util/util.hpp
+
+  util/io.cpp
+  util/io.hpp
 
   main.cpp
 )

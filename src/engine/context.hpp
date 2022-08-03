@@ -5,11 +5,9 @@
 #include <engine/audio.hpp>
 #include <engine/basis.hpp>
 #include <engine/config.hpp>
-#include <engine/env.hpp>
 
 namespace rr {
 struct Context {
-	Env env{};
 	ktl::kunique_ptr<capo::Instance> capo_instance{};
 	vf::Context vf_context;
 	Config config{};

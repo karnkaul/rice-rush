@@ -3,6 +3,7 @@
 #include <game/hud.hpp>
 #include <game/player.hpp>
 #include <game/resources.hpp>
+#include <util/logger.hpp>
 #include <util/util.hpp>
 
 namespace rr {
@@ -45,7 +46,7 @@ void Hud::setup() {
 	m_over.title.set_string("GAME OVER");
 	m_over.restart.set_string("press [Enter / Start] to retry");
 
-	if constexpr (debug_v) {
+	if constexpr (logger::debug_v) {
 		m_debug = {vfc, "debug"};
 		m_debug.transform().position = {hud.offset.x + 0.5f * hud.extent.x - layout().basis.scale * 50.0f, hud.offset.y};
 		m_debug.set_font(&resources.fonts.main).set_height(static_cast<vf::Text::Height>(hud.extent.y * 0.2f)).set_align({vf::Text::Horz::eRight});
@@ -87,7 +88,7 @@ void Hud::tick(DeltaTime dt) {
 		m_high_score = high_score;
 	}
 
-	if constexpr (debug_v) { m_debug.set_string(ktl::kformat("{} FPS\t{}", game()->framerate().fps(), util::format_elapsed(game()->elapsed()))); }
+	if constexpr (logger::debug_v) { m_debug.set_string(ktl::kformat("{} FPS\t{}", game()->framerate().fps(), util::format_elapsed(game()->elapsed()))); }
 }
 
 void Hud::draw(vf::Frame const& frame) const {
@@ -100,6 +101,6 @@ void Hud::draw(vf::Frame const& frame) const {
 	frame.draw(m_background);
 	frame.draw(m_health);
 	frame.draw(m_score);
-	if constexpr (debug_v) { frame.draw(m_debug); }
+	if constexpr (logger::debug_v) { frame.draw(m_debug); }
 }
 } // namespace rr
