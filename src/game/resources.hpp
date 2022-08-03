@@ -1,7 +1,7 @@
 #pragma once
 #include <capo/sound.hpp>
 #include <engine/sprite.hpp>
-#include <util/byte_array.hpp>
+#include <ktl/byte_array.hpp>
 #include <util/index_timeline.hpp>
 #include <util/ptr.hpp>
 #include <vulkify/core/time.hpp>
@@ -52,7 +52,7 @@ struct Resources {
 
 struct Resources::Loader {
 	Context& context;
-	ByteArray buffer{};
+	ktl::byte_array buffer{};
 
 	bool operator()(vf::Ttf& out, char const* uri);
 	bool operator()(vf::Texture& out, char const* uri, Ptr<vf::TextureCreateInfo const> info = {});

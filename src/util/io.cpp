@@ -1,4 +1,4 @@
-#include <util/byte_array.hpp>
+#include <ktl/byte_array.hpp>
 #include <util/io.hpp>
 #include <util/logger.hpp>
 #include <physfs.h>
@@ -14,7 +14,7 @@ namespace fs = std::filesystem;
 
 std::vector<std::string> g_prefixes{};
 
-bool read_zip(ByteArray& out, char const* uri) {
+bool read_zip(ktl::byte_array& out, char const* uri) {
 	if (PHYSFS_exists(uri) == 0) { return false; }
 	auto file = PHYSFS_openRead(uri);
 	if (!file) { return false; }
@@ -23,7 +23,7 @@ bool read_zip(ByteArray& out, char const* uri) {
 	return true;
 }
 
-bool read_file(ByteArray& out, char const* uri) {
+bool read_file(ktl::byte_array& out, char const* uri) {
 	for (auto const& prefix : g_prefixes) {
 		if (auto in = std::ifstream((fs::path(prefix) / uri), std::ios::binary | std::ios::ate)) {
 			in.unsetf(std::ios::skipws);
@@ -86,7 +86,7 @@ bool io::exists(char const* uri) {
 	return false;
 }
 
-bool io::load(ByteArray& out, char const* uri) {
+bool io::load(ktl::byte_array& out, char const* uri) {
 	if (read_zip(out, uri)) {
 		logger::debug("[zipfs] loaded [{}]", uri);
 		return true;

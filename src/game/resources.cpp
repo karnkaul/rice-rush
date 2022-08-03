@@ -59,7 +59,7 @@ bool validate(IndexTimeline::Sequence const& sequence, std::string_view const ur
 	return true;
 }
 
-bool load(ByteArray& out_buffer, vf::Image& out, char const* uri) {
+bool load(ktl::byte_array& out_buffer, vf::Image& out, char const* uri) {
 	if (!io::load(out_buffer, uri)) {
 		logger::warn("[Resources] Failed to read image: [{}]", uri);
 		return false;

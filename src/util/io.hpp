@@ -1,8 +1,10 @@
 #pragma once
 
-namespace rr {
-class ByteArray;
+namespace ktl {
+class byte_array;
+}
 
+namespace rr {
 namespace io {
 class Instance {
   public:
@@ -15,6 +17,6 @@ class Instance {
 bool mount_dir(char const* path);
 bool mount_zip(char const* zip, char const* point = "");
 bool exists(char const* uri);
-bool load(ByteArray& out, char const* uri);
+bool load(ktl::byte_array& out, char const* uri);
 } // namespace io
 } // namespace rr
