@@ -15,7 +15,6 @@ class Instance {
 };
 
 bool mount_dir(char const* path);
-bool mount_zip(char const* zip, char const* point = "");
 bool exists(char const* uri);
 bool load(ktl::byte_array& out, char const* uri);
 } // namespace io

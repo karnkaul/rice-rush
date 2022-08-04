@@ -13,9 +13,14 @@ std::string timestamp() {
 }
 } // namespace
 
-std::string logger::log_string(std::string_view const text) { return ktl::kformat("{} {}", text, timestamp()); }
+std::string logger::build_log_string(std::string_view const text) { return ktl::kformat("{} {}", text, timestamp()); }
 
 void logger::do_print(Pipe pipe, char level, char const* text) {
 	auto const out = pipe == Pipe::StdErr ? stderr : stdout;
 	std::fprintf(out, "[%c] %s\n", level, text);
+}
+
+void logger::print_verbatim(Pipe pipe, char const* text) {
+	auto const out = pipe == Pipe::StdErr ? stderr : stdout;
+	std::fprintf(out, "%s\n", text);
 }

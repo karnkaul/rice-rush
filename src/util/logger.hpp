@@ -11,12 +11,13 @@ constexpr bool debug_v =
 	false;
 #endif
 
-std::string log_string(std::string_view text);
+std::string build_log_string(std::string_view text);
 void do_print(Pipe pipe, char level, char const* text);
+void print_verbatim(Pipe pipe, char const* text);
 
 template <typename... Args>
 void print(Pipe pipe, char level, std::string_view const fmt, Args const&... args) {
-	do_print(pipe, level, log_string(ktl::kformat(fmt, args...)).c_str());
+	do_print(pipe, level, build_log_string(ktl::kformat(fmt, args...)).c_str());
 }
 
 template <typename... Args>

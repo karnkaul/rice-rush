@@ -1,0 +1,6 @@
+#pragma once
+#include <ktl/kversion.hpp>
+
+namespace rr {
+constexpr auto version_v = ktl::kversion{@PROJECT_VERSION_MAJOR@, @PROJECT_VERSION_MINOR@, @PROJECT_VERSION_PATCH@};
+} // namespace rr

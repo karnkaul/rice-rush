@@ -13,7 +13,7 @@ https://user-images.githubusercontent.com/16272243/182459173-e2da7916-b09e-4577-
 1. x64 Windows 10
 1. x64 Linux: X11, Wayland (untested)
 
-Grab the [latest release](https://github.com/karnkaul/rice-rush/releases) and unzip to a desired location, or build and _install_ (TODO) via CMake.
+Grab the [latest release](https://github.com/karnkaul/rice-rush/releases) and unzip to a desired location, or build via CMake and run.
 
 ## Controls
 

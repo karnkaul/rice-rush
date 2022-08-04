@@ -1,3 +1,4 @@
+#include <build_version.hpp>
 #include <engine/context.hpp>
 #include <game/background.hpp>
 #include <game/cooker_pool.hpp>
@@ -24,12 +25,29 @@ fs::path find_data(fs::path start) {
 	return {};
 }
 
-std::optional<Context> make_context(int argc, char const* const argv[]) {
+bool parse_arg(std::string_view const arg) {
+	if (arg == "--version") {
+		auto const& v = version_v;
+		logger::print_verbatim(logger::Pipe::StdOut, ktl::kformat("Rice Rush v{}.{}.{}", v.major, v.minor, v.patch).c_str());
+		return false;
+	}
+	return true;
+}
+
+std::optional<int> parse_args(int argc, char const* const argv[]) {
 	if (argc < 1) {
 		logger::error("Fatal error: no arguments passed to main");
-		return {};
+		return EXIT_FAILURE;
 	}
-	auto const exe = fs::path{argv[0]};
+	for (int i = 1; i < argc; ++i) {
+		if (!parse_arg(argv[i])) { return EXIT_SUCCESS; }
+	}
+	return {};
+}
+
+std::optional<Context> make_context(std::string_view const arg0) {
+
+	auto const exe = fs::path{arg0};
 	auto const exe_dir = fs::absolute(exe.parent_path());
 	auto config = Config::load(exe_dir.generic_string(), "config.txt");
 	auto builder = vf::Builder{};
@@ -50,18 +68,6 @@ std::optional<Context> make_context(int argc, char const* const argv[]) {
 	ret.audio = *ret.capo_instance;
 
 	if (auto data = find_data(exe_dir); !data.empty()) { io::mount_dir(data.generic_string().c_str()); }
-	auto mounted = 0;
-	auto const mount_zip = [&mounted](char const* path) {
-		if (io::mount_zip(path)) { logger::info("Mounting data pack {}: [data.zip]", ++mounted); }
-		return false;
-	};
-	static constexpr auto rr_data_v = std::string_view{"rr.data"};
-	bool rr_data{};
-	for (int i = 1; i < argc; ++i) {
-		auto const pack_path = fs::absolute(argv[i]);
-		if (!pack_path.extension().empty() && mount_zip(pack_path.generic_string().c_str())) { rr_data = argv[i] == rr_data_v; }
-	}
-	if (!rr_data && fs::is_regular_file(rr_data_v)) { mount_zip(rr_data_v.data()); }
 
 	return ret;
 }
@@ -124,7 +130,8 @@ void run(Context context) {
 
 int main(int argc, char* argv[]) {
 	auto io_inst = rr::io::Instance(argv[0]);
-	auto context = rr::make_context(argc, argv);
+	if (auto ret = rr::parse_args(argc, argv)) { return *ret; }
+	auto context = rr::make_context(argv[0]);
 	if (!context) { return EXIT_FAILURE; }
 	rr::run(std::move(*context));
 }

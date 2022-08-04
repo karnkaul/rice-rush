@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON) # enable PIC
 set(CMAKE_DEBUG_POSTFIX "-d")
@@ -13,8 +13,8 @@ endif()
 
 # project parameters
 set(project_name rice-rush)
-set(project_version "0.1.0")
-set(project_version_name rice-rush_version) # name of variable in generated header
+set(project_version "1.1.0")
+set(project_version_name build_version) # name of variable in generated header
 
 project(${project_name} VERSION "${project_version}")
 set(is_root_project OFF) # indicate if this is the top-level project
@@ -40,7 +40,7 @@ function(configure_version)
   set(in "${CMAKE_CURRENT_SOURCE_DIR}/src/${project_version_name}.hpp.in")
 
   if(EXISTS "${in}")
-    set(out "${CMAKE_CURRENT_BINARY_DIR}/${project_version_name}.hpp.in")
+    set(out "${CMAKE_CURRENT_BINARY_DIR}/${project_version_name}.hpp")
     message(STATUS "Configuring ${out}")
     configure_file("${in}" "${out}")
   endif()
@@ -57,7 +57,7 @@ target_source_group(TARGET ${PROJECT_NAME})
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:RR_DEBUG>)
 target_include_directories(${PROJECT_NAME} PRIVATE src "${CMAKE_CURRENT_BINARY_DIR}")
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
-target_link_libraries(${PROJECT_NAME} PRIVATE capo::capo vulkify::vulkify PhysFS::PhysFS)
+target_link_libraries(${PROJECT_NAME} PRIVATE capo::capo vulkify::vulkify)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_ID MATCHES GNU)
   target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror=return-type -Wconversion)
