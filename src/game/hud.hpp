@@ -1,6 +1,6 @@
 #pragma once
+#include <engine/instanced.hpp>
 #include <game/game_object.hpp>
-#include <vulkify/graphics/primitives/instanced_mesh.hpp>
 #include <vulkify/graphics/primitives/text.hpp>
 
 namespace rr {
@@ -24,7 +24,7 @@ class Hud final : public GameObject {
 	} m_over{};
 
 	vf::Mesh m_background{};
-	vf::InstancedMesh<> m_health{};
+	vf::InstancedMesh<vf::DrawInstance[3]> m_health{};
 	vf::Text m_score{};
 	vf::Text m_debug{};
 

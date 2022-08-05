@@ -73,7 +73,7 @@ bool load(ktl::byte_array& out_buffer, vf::Image& out, char const* uri) {
 } // namespace
 
 bool Resources::Loader::operator()(vf::Ttf& out, char const* uri) {
-	if (!out) { out = vf::Ttf(context.vf_context, std::string(uri)); }
+	if (!out) { out = vf::Ttf{context.vf_context}; }
 	if (!io::load(buffer, uri)) {
 		logger::warn("[Resources] Failed to read Ttf: [{}]", uri);
 		return false;
@@ -90,7 +90,7 @@ bool Resources::Loader::operator()(vf::Texture& out, char const* uri, Ptr<vf::Te
 	if (!load(buffer, image, uri)) { return false; }
 	if (!out || info) {
 		auto tci = info ? *info : vf::TextureCreateInfo{};
-		out = vf::Texture(context.vf_context, std::string(uri), image, tci);
+		out = vf::Texture(context.vf_context, image, tci);
 		if (!out) {
 			logger::warn("[Resources] Failed to create Texture: [{}]", uri);
 			return false;
@@ -115,7 +115,7 @@ bool Resources::Loader::operator()(SheetAnimation& out_anim, char const* uri) {
 
 	auto image = vf::Image{};
 	if (!load(buffer, image, info.image_uri.c_str())) { return false; }
-	out_anim.texture = vf::Texture(context.vf_context, std::string(uri), image);
+	out_anim.texture = vf::Texture(context.vf_context, image);
 	out_anim.sheet = &out_anim.texture;
 	out_anim.sheet.set_uvs(static_cast<std::size_t>(info.tile_count.y), static_cast<std::size_t>(info.tile_count.x));
 	if (out_anim.sequence.end <= out_anim.sequence.begin) { out_anim.sequence.end = out_anim.sheet.uv_count(); }

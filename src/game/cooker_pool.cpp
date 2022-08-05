@@ -26,7 +26,7 @@ void CookerPool::spawn(Cooker const& cooker) {
 	entry.trigger = {cooker.position, trigger_diameter};
 	entry.cooker = cooker;
 
-	entry.text = vf::Text(game()->context.vf_context, "cooker");
+	entry.text = vf::Text(game()->context.vf_context);
 	entry.text.set_font(&game()->resources.fonts.main).set_height(text_height).set_string(util::format_elapsed(cooker.cook));
 	entry.text.transform().position = entry.trigger.centre;
 	entry.text.transform().position.y += 0.75f * size.y;
@@ -52,8 +52,8 @@ bool CookerPool::intersecting(Trigger const& trigger) const {
 }
 
 void CookerPool::setup() {
-	m_entries.mesh = {game()->context.vf_context, "cookers"};
-	m_entries.mesh.gbo.write(vf::Geometry::make_quad({size * basis().scale}));
+	m_entries.mesh = Instanced<Entry>::Mesh{game()->context.vf_context};
+	m_entries.mesh.buffer.write(vf::Geometry::make_quad({size * basis().scale}));
 	m_entries.mesh.texture = game()->resources.textures.cooker.handle();
 
 	m_sfx = game()->context.capo_instance->make_source();
@@ -109,7 +109,7 @@ auto CookerPool::update_and_get_nearest(Trigger& player, vf::Time dt) -> Ptr<Ins
 		float sqrDist{};
 	} nearest{};
 
-	auto setNearest = [&](Instanced<Entry>::Entry& e) {
+	auto set_nearest = [&](Instanced<Entry>::Entry& e) {
 		if (e.t.cooker.cook > 0s) { return; }
 		auto const toT = glm::length2(e.t.cooker.position - player.centre);
 		if (!nearest.entry || toT < nearest.sqrDist) { nearest = {&e, toT}; }
@@ -119,7 +119,7 @@ auto CookerPool::update_and_get_nearest(Trigger& player, vf::Time dt) -> Ptr<Ins
 	auto ticking{false};
 	for (auto& entry : m_entries.entries) {
 		entry.t.trigger.interactable = false;
-		if (player.intersecting(entry.t.trigger)) { setNearest(entry); }
+		if (player.intersecting(entry.t.trigger)) { set_nearest(entry); }
 		if (entry.t.cooker.cook > 0s) {
 			entry.t.cooker.cook -= dt;
 		} else {

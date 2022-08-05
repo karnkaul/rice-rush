@@ -21,7 +21,7 @@ void TriggerRenderer::render(std::span<Ptr<Trigger const> const> triggers, vf::F
 
 std::span<vf::CircleShape> TriggerRenderer::make_group(std::size_t count) {
 	m_circles.reserve(count);
-	for (std::size_t i = m_circles.size(); i < count; ++i) { m_circles.push_back(vf::CircleShape(m_context->vf_context, "trigger")); }
+	for (std::size_t i = m_circles.size(); i < count; ++i) { m_circles.push_back(vf::CircleShape(m_context->vf_context)); }
 	return std::span(m_circles.data(), count);
 }
 } // namespace rr

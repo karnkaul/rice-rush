@@ -1,28 +1,39 @@
+#include <engine/context.hpp>
 #include <engine/sprite.hpp>
-#include <vulkify/graphics/resources/texture.hpp>
+#include <vulkify/context/frame.hpp>
+#include <vulkify/graphics/texture.hpp>
 
 namespace rr {
-Sprite::Sprite(Context const& context, std::string name) { m_quad = Quad(context, {}, std::move(name)); }
+Sprite::Sprite(Context const& context) : m_quad(context.vf_context) {}
 
 Sprite& Sprite::set_size(glm::vec2 size) {
-	m_quad.set_size(size);
+	auto state = m_quad.state();
+	state.size = size;
+	m_quad.set_state(state);
 	return *this;
 }
 
 Sprite& Sprite::set_uv_index(std::size_t index) {
-	if (m_sheet) { m_quad.set_uv(m_sheet->uv(index)); }
+	if (m_sheet) {
+		auto state = m_quad.state();
+		state.uv = m_sheet->uv(index);
+		m_quad.set_state(state);
+	}
 	return *this;
 }
 
 Sprite& Sprite::set_sheet(Ptr<Sheet const> sheet) {
 	m_sheet = sheet;
 	if (auto texture = m_sheet ? m_sheet->texture() : nullptr) {
-		m_quad.set_texture(texture->handle()).set_uv(m_sheet->uv(0));
+		m_quad.set_texture(texture);
+		set_uv_index(0);
 	} else {
 		m_quad.set_texture({});
 	}
 	return *this;
 }
+
+void Sprite::draw(vf::Frame const& frame) const { frame.draw(m_quad); }
 
 auto Sprite::Sheet::set_texture(Ptr<vf::Texture const> texture) -> Sheet& {
 	m_texture = texture;

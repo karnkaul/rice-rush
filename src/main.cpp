@@ -46,7 +46,6 @@ std::optional<int> parse_args(int argc, char const* const argv[]) {
 }
 
 std::optional<Context> make_context(std::string_view const arg0) {
-
 	auto const exe = fs::path{arg0};
 	auto const exe_dir = fs::absolute(exe.parent_path());
 	auto config = Config::load(exe_dir.generic_string(), "config.txt");

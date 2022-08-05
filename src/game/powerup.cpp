@@ -115,7 +115,7 @@ void Powerup::deactivate() {
 }
 
 void Powerup::setup() {
-	m_sprite = AnimatedSprite(game()->context, "powerup");
+	m_sprite = AnimatedSprite{game()->context};
 	layer = layers::powerup;
 
 	diameter *= basis().scale;
@@ -150,7 +150,7 @@ bool Powerup::can_activate() const {
 void Powerup::activate(Ptr<vf::Texture const> texture) {
 	m_sheet.set_texture(texture);
 	m_sprite.set_size(glm::vec2{diameter}).set_sheet(&m_sheet);
-	m_sprite.instance().transform.position = m_trigger.centre = random_position();
+	m_sprite.transform().position = m_trigger.centre = random_position();
 	m_trigger.diameter = diameter * (1.0f + squish_coeff);
 	m_active.elapsed = {};
 }
@@ -158,7 +158,7 @@ void Powerup::activate(Ptr<vf::Texture const> texture) {
 void Powerup::update_active(vf::Time dt) {
 	auto const squish = squish_rate * m_active.elapsed.count();
 	auto const delta = squish_coeff * glm::vec2{std::cos(squish), std::sin(squish)};
-	m_sprite.instance().transform.scale = glm::vec2{1.0f} + delta;
+	m_sprite.transform().scale = glm::vec2{1.0f} + delta;
 
 	if (m_trigger.intersecting(game()->player().trigger)) {
 		game()->audio().play(game()->resources.sfx.powerup);

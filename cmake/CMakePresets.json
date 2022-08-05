@@ -10,7 +10,7 @@
 			"name": "default",
 			"description": "Default build using Ninja",
 			"generator": "Ninja",
-			"binaryDir": "out/default",
+			"binaryDir": "${sourceDir}/out/default",
 			"cacheVariables": {
 				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
 			}
@@ -18,8 +18,7 @@
 		{
 			"name": "ninja-clang",
 			"description": "Base configuration using Ninja / clang",
-			"hidden": true,
-			"inherits": "default",
+			"inherits": "${sourceDir}/default",
 			"cacheVariables": {
 				"CMAKE_C_COMPILER": "clang",
 				"CMAKE_CXX_COMPILER": "clang++"
@@ -28,7 +27,7 @@
 		{
 			"name": "ninja-debug",
 			"description": "Debug build using Ninja",
-			"binaryDir": "out/db",
+			"binaryDir": "${sourceDir}/out/db",
 			"inherits": "default",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug"
@@ -37,7 +36,7 @@
 		{
 			"name": "ninja-release",
 			"description": "Release build using Ninja",
-			"binaryDir": "out/rl",
+			"binaryDir": "${sourceDir}/out/rl",
 			"inherits": "default",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release"
@@ -46,7 +45,7 @@
 		{
 			"name": "ninja-relw",
 			"description": "RelWithDebInfo build using Ninja/clang",
-			"binaryDir": "out/rw",
+			"binaryDir": "${sourceDir}/out/rw",
 			"inherits": "default",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "RelWithDebInfo"
@@ -56,7 +55,7 @@
 			"name": "vs19",
 			"description": "Build configuration using Visual Studio 16 (2019)",
 			"generator": "Visual Studio 16 2019",
-			"binaryDir": "out/vs",
+			"binaryDir": "${sourceDir}/out/vs",
 			"architecture": {
 				"value": "x64",
 				"strategy": "external"
@@ -72,19 +71,55 @@
 			"name": "ninja-ubsan",
 			"description": "UBSan debug build using Ninja",
 			"inherits": "ninja-debug",
-			"binaryDir": "out/ubsan",
+			"binaryDir": "${sourceDir}/out/ubsan",
 			"cacheVariables": {
 				"CMAKE_CXX_FLAGS": "-fsanitize=undefined"
 			}
 		},
 		{
-			"name": "ninja-asan",
-			"description": "UBSan debug build using Ninja",
+			"name": "pre-install",
+			"description": "Debug build using Ninja and install prefix",
 			"inherits": "ninja-debug",
-			"binaryDir": "out/asan",
+			"binaryDir": "${sourceDir}/out/pre",
+			"generator": "Ninja Multi-Config",
 			"cacheVariables": {
-				"RR_ASAN": "ON"
+				"CMAKE_PREFIX_PATH": "out/install",
+				"RR_PREINSTALLED": "ON"
 			}
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "Debug",
+			"configurePreset": "pre-install",
+			"configuration": "Debug"
+		},
+		{
+			"name": "Release",
+			"configurePreset": "pre-install",
+			"configuration": "Release"
+		},
+		{
+			"name": "RelWithDebInfo",
+			"configurePreset": "pre-install",
+			"configuration": "RelWithDebInfo"
+		}
+	],
+	"testPresets": [
+		{
+			"name": "Debug",
+			"configurePreset": "pre-install",
+			"configuration": "Debug"
+		},
+		{
+			"name": "Release",
+			"configurePreset": "pre-install",
+			"configuration": "Release"
+		},
+		{
+			"name": "RelWithDebInfo",
+			"configurePreset": "pre-install",
+			"configuration": "RelWithDebInfo"
 		}
 	]
 }

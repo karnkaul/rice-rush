@@ -9,7 +9,7 @@
 namespace rr {
 void ExplodePool::spawn(glm::vec2 const position) {
 	auto& entry = make_entry();
-	entry.sprite.instance().transform.position = position;
+	entry.sprite.transform().position = position;
 	game()->audio().play(game()->resources.sfx.explode);
 }
 
@@ -18,7 +18,7 @@ void ExplodePool::tick(DeltaTime dt) {
 	for (auto& entry : m_active) {
 		entry.sprite.tick(dt.scaled);
 		if (entry.impulsed && entry.ttl.force > 0s) {
-			auto const to_player = player.sprite.instance().transform.position - entry.sprite.instance().transform.position;
+			auto const to_player = player.sprite.transform().position - entry.sprite.transform().position;
 			if (auto const sqr_mag = glm::length2(to_player); sqr_mag > 0.0f) {
 				auto const dir = to_player / std::sqrt(sqr_mag);
 				player.translate(force.impulse * dt.scaled.count() * basis().scale * dir);
@@ -45,7 +45,7 @@ void ExplodePool::draw(vf::Frame const& frame) const {
 auto ExplodePool::make_entry() -> Entry& {
 	auto const& anim = game()->resources.animations.explode;
 	if (m_inactive.empty()) {
-		m_active.push_back({AnimatedSprite(game()->context, "explode")});
+		m_active.push_back({AnimatedSprite{game()->context}});
 		m_active.back().sprite.set_size(basis().scale * size);
 		logger::info("explode created");
 	} else {

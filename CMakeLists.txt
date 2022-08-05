@@ -48,12 +48,16 @@ endfunction()
 
 configure_version()
 
-add_subdirectory(ext)
+if(RR_PREINSTALLED)
+  find_package(vulkify CONFIG REQUIRED)
+  find_package(capo CONFIG REQUIRED)
+else()
+  add_subdirectory(ext)
+endif()
 
 # exe
 add_executable(${PROJECT_NAME})
 add_subdirectory(src)
-target_source_group(TARGET ${PROJECT_NAME})
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:RR_DEBUG>)
 target_include_directories(${PROJECT_NAME} PRIVATE src "${CMAKE_CURRENT_BINARY_DIR}")
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)

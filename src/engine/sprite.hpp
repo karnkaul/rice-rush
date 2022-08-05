@@ -1,33 +1,36 @@
 #pragma once
-#include <engine/quad.hpp>
 #include <util/ptr.hpp>
+#include <vulkify/graphics/primitives/quad_shape.hpp>
 
 namespace vf {
-class Texture;
-}
+class Frame;
+} // namespace vf
 
 namespace rr {
+class Context;
+
 class Sprite {
   public:
 	class Sheet;
-	struct Sequence;
 
 	Sprite() = default;
-	explicit Sprite(Context const& context, std::string name = "sprite");
+	explicit Sprite(Context const& context);
 
 	Sprite& set_size(glm::vec2 size);
 	Sprite& set_uv_index(std::size_t index);
 	Sprite& set_sheet(Ptr<Sheet const> sheet);
 
-	Quad const& quad() const { return m_quad; }
-	vf::DrawInstance& instance() { return m_quad.instance(); }
-	vf::DrawInstance const& instance() const { return m_quad.instance(); }
+	vf::QuadShape const& quad() const { return m_quad; }
+	vf::Transform const& transform() const { return m_quad.transform(); }
+	vf::Transform& transform() { return m_quad.transform(); }
+	vf::Rgba const& tint() const { return m_quad.tint(); }
+	vf::Rgba& tint() { return m_quad.tint(); }
 	Ptr<Sheet const> sheet() const { return m_sheet; }
 
-	void draw(vf::Frame const& frame) const { m_quad.draw(frame); }
+	void draw(vf::Frame const& frame) const;
 
   private:
-	Quad m_quad{};
+	vf::QuadShape m_quad{};
 	Ptr<Sheet const> m_sheet{};
 };
 

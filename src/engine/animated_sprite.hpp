@@ -8,7 +8,7 @@ class AnimatedSprite : public Sprite {
 	using Sequence = IndexTimeline::Sequence;
 
 	AnimatedSprite() = default;
-	AnimatedSprite(Context const& context, std::string name = "animated_sprite") : Sprite(context, std::move(name)) {}
+	AnimatedSprite(Context const& context) : Sprite(context) {}
 
 	IndexTimeline timeline{};
 

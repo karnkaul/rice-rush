@@ -15,7 +15,7 @@ Ptr<T> refresh(std::span<ktl::kunique_ptr<T> const> ts, Trigger& player) {
 	} nearest{};
 
 	auto setNearest = [&player, &nearest](T& pawn) {
-		auto const toT = glm::length2(pawn.sprite.instance().transform.position - player.centre);
+		auto const toT = glm::length2(pawn.sprite.transform().position - player.centre);
 		if (!nearest.t || toT < nearest.sqrDist) { nearest = {&pawn, toT}; }
 	};
 
@@ -39,7 +39,7 @@ constexpr glm::vec2 clamp(glm::vec2 in, vf::Rect const& playArea, glm::vec2 cons
 } // namespace
 
 void Player::translate(glm::vec2 xy) {
-	auto& pos = sprite.instance().transform.position;
+	auto& pos = sprite.transform().position;
 	pos += xy;
 	trigger.centre = pos = clamp(pos, game()->layout.play_area, sprite.quad().size() * 0.5f);
 }
@@ -69,12 +69,12 @@ void Player::reset(glm::vec2 const position) {
 	m_state = {};
 	auto const& anim = game()->resources.animations.player;
 	sprite.set_sheet(anim.sheet, anim.sequence).set_size(size);
-	sprite.instance().transform.position = trigger.centre = position;
-	sprite.instance().transform.scale = glm::vec2{1.0f};
+	sprite.transform().position = trigger.centre = position;
+	sprite.transform().scale = glm::vec2{1.0f};
 }
 
 void Player::setup() {
-	sprite = AnimatedSprite(game()->context, "player");
+	sprite = AnimatedSprite{game()->context};
 	layer = layers::player;
 
 	size *= basis().scale;
@@ -92,13 +92,13 @@ void Player::tick(DeltaTime dt) {
 	translate(cs.xy * speed * basis().scale * dt.scaled.count());
 	if (std::abs(cs.xy.x) > 0.01f) {
 		if (cs.xy.x < 0.0f) {
-			sprite.instance().transform.scale.x = -1.0f;
+			sprite.transform().scale.x = -1.0f;
 		} else {
-			sprite.instance().transform.scale.x = 1.0f;
+			sprite.transform().scale.x = 1.0f;
 		}
 	}
 
 	auto const alpha = static_cast<vf::Rgba::Channel>(m_state.health.is_immune() ? 0xbb : 0xff);
-	sprite.instance().tint.channels[3] = alpha;
+	sprite.tint().channels[3] = alpha;
 }
 } // namespace rr
