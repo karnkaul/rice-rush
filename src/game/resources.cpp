@@ -1,5 +1,6 @@
 #include <engine/context.hpp>
 #include <game/resources.hpp>
+#include <util/io.hpp>
 #include <util/logger.hpp>
 #include <util/property.hpp>
 #include <fstream>
@@ -58,47 +59,38 @@ bool validate(IndexTimeline::Sequence const& sequence, std::string_view const ur
 	return true;
 }
 
-std::vector<std::byte> read_file(char const* path) {
-	if (auto in = std::ifstream(path, std::ios::binary | std::ios::ate)) {
-		in.unsetf(std::ios::skipws);
-		auto const size = in.tellg();
-		auto buf = std::vector<std::byte>(static_cast<std::size_t>(size));
-		in.seekg(0, std::ios::beg);
-		in.read(reinterpret_cast<char*>(buf.data()), size);
-		return buf;
+bool load(ktl::byte_array& out_buffer, vf::Image& out, char const* uri) {
+	if (!io::load(out_buffer, uri)) {
+		logger::warn("[Resources] Failed to read image: [{}]", uri);
+		return false;
 	}
-	return {};
-}
-
-std::vector<std::byte> read_file(Env const& env, std::string_view uri) { return read_file(data_path(env, uri).c_str()); }
-
-bool load(vf::Image& out, char const* path) {
-	auto bytes = read_file(path);
-	if (!out.load(vf::Image::Encoded{bytes})) {
-		logger::warn("[Resources] Failed to open image: [{}]", path);
+	if (!out.load(vf::Image::Encoded{out_buffer})) {
+		logger::warn("[Resources] Failed to open image: [{}]", uri);
 		return false;
 	}
 	return true;
 }
 } // namespace
 
-bool Resources::Loader::operator()(vf::Ttf& out, std::string_view uri) const {
-	if (!out) { out = vf::Ttf(context.vf_context, std::string(uri)); }
-	auto bytes = read_file(context.env, uri);
-	if (!out.load(bytes)) {
+bool Resources::Loader::operator()(vf::Ttf& out, char const* uri) {
+	if (!out) { out = vf::Ttf{context.vf_context}; }
+	if (!io::load(buffer, uri)) {
+		logger::warn("[Resources] Failed to read Ttf: [{}]", uri);
+		return false;
+	}
+	if (!out.load(buffer)) {
 		logger::warn("[Resources] Failed to load Ttf: [{}]", uri);
 		return false;
 	}
-	logger::debug("[Resources] Ttf [{}] loaded", uri);
 	return true;
 }
 
-bool Resources::Loader::operator()(vf::Texture& out, std::string_view uri, Ptr<vf::TextureCreateInfo const> info) const {
+bool Resources::Loader::operator()(vf::Texture& out, char const* uri, Ptr<vf::TextureCreateInfo const> info) {
 	auto image = vf::Image{};
-	if (!load(image, data_path(context.env, uri).c_str())) { return false; }
+	if (!load(buffer, image, uri)) { return false; }
 	if (!out || info) {
 		auto tci = info ? *info : vf::TextureCreateInfo{};
-		out = vf::Texture(context.vf_context, std::string(uri), image, tci);
+		out = vf::Texture(context.vf_context, image, tci);
 		if (!out) {
 			logger::warn("[Resources] Failed to create Texture: [{}]", uri);
 			return false;
@@ -108,84 +100,77 @@ bool Resources::Loader::operator()(vf::Texture& out, std::string_view uri, Ptr<v
 		logger::warn("[Resources] Failed to create Texture: [{}]", uri);
 		return false;
 	}
-	logger::debug("[Resources] Texture [{}] loaded", uri);
 	return true;
 }
 
-bool Resources::Loader::operator()(SheetAnimation& out_anim, std::string_view uri) const {
-	auto bytes = read_file(context.env, uri);
-	if (bytes.empty()) {
-		logger::warn("[Resources] Failed to load Sprite::Sheet: [{}]", uri);
+bool Resources::Loader::operator()(SheetAnimation& out_anim, char const* uri) {
+	if (!io::load(buffer, uri)) {
+		logger::warn("[Resources] Failed to read sheet animation: [{}]", uri);
 		return false;
 	}
-	auto str = std::stringstream{reinterpret_cast<char const*>(bytes.data())};
+	auto str = std::stringstream{reinterpret_cast<char const*>(buffer.data())};
 	auto const info = get_sheet_info(str, &out_anim.sequence);
 	if (!validate(info, uri)) { return false; }
 	if (!validate(out_anim.sequence, uri)) { return false; }
 
 	auto image = vf::Image{};
-	if (!load(image, data_path(context.env, info.image_uri).c_str())) { return false; }
-	out_anim.texture = vf::Texture(context.vf_context, std::string(uri), image);
-	out_anim.sheet = &out_anim.texture;
-	out_anim.sheet.set_uvs(static_cast<std::size_t>(info.tile_count.y), static_cast<std::size_t>(info.tile_count.x));
+	if (!load(buffer, image, info.image_uri.c_str())) { return false; }
+	out_anim.texture = vf::Texture(context.vf_context, image);
+	out_anim.sheet.set_uvs(&out_anim.texture, static_cast<vf::Sprite::UvIndex>(info.tile_count.y), static_cast<vf::Sprite::UvIndex>(info.tile_count.x));
 	if (out_anim.sequence.end <= out_anim.sequence.begin) { out_anim.sequence.end = out_anim.sheet.uv_count(); }
 
-	logger::debug("[Resources] Sprite::Sheet [{}] loaded", uri);
 	return true;
 }
 
-bool Resources::Loader::operator()(capo::Sound& out, std::string_view uri) const {
-	auto bytes = read_file(context.env, uri);
-	if (bytes.empty()) {
-		logger::warn("[Resources] Failed to load PCM: [{}]", uri);
+bool Resources::Loader::operator()(capo::Sound& out, char const* uri) {
+	if (!io::load(buffer, uri)) {
+		logger::warn("[Resources] Failed to read PCM: [{}]", uri);
 		return false;
 	}
-	auto pcm = capo::PCM::from_memory(bytes, capo::FileFormat::eUnknown);
+	auto pcm = capo::PCM::from_memory(buffer, capo::FileFormat::eUnknown);
 	if (!pcm) {
 		logger::warn("[Resources] Failed to load PCM: [{}]", uri);
 		return false;
 	}
 	out = context.capo_instance->make_sound(*pcm);
-	logger::debug("[Resources] Sound [{}] loaded", uri);
 	return true;
 }
 
-bool Resources::Loader::operator()(Resources& out, std::string_view uri) const {
-	auto bytes = read_file(context.env, uri);
-	if (bytes.empty()) {
-		logger::warn("[Resources] Failed to load Sprite::Sheet: [{}]", uri);
+bool Resources::Loader::operator()(Resources& out, char const* uri) {
+	if (!io::load(buffer, uri)) {
+		logger::warn("[Resources] Failed to read manifest: [{}]", uri);
 		return false;
 	}
-	auto str = std::stringstream{reinterpret_cast<char const*>(bytes.data())};
+	auto str = std::stringstream{std::string(reinterpret_cast<char const*>(buffer.data()), buffer.size())};
 	auto parser = util::Property::Parser{str};
 	int count{};
 	parser.parse_all([&](util::Property property) {
 		if (property.key == "fonts/main") {
-			if (operator()(out.fonts.main, property.value)) { ++count; }
+			if (operator()(out.fonts.main, property.value.c_str())) { ++count; }
 		} else if (property.key == "textures/background") {
-			if (operator()(out.textures.background, property.value)) { ++count; }
+			if (operator()(out.textures.background, property.value.c_str())) { ++count; }
 		} else if (property.key == "textures/health") {
-			if (operator()(out.textures.health, property.value)) { ++count; }
+			if (operator()(out.textures.health, property.value.c_str())) { ++count; }
 		} else if (property.key == "textures/cooker") {
-			if (operator()(out.textures.cooker, property.value)) { ++count; }
+			if (operator()(out.textures.cooker, property.value.c_str())) { ++count; }
 		} else if (property.key == "textures/powerups/heal") {
-			if (operator()(out.textures.powerups.heal, property.value)) { ++count; }
+			if (operator()(out.textures.powerups.heal, property.value.c_str())) { ++count; }
 		} else if (property.key == "textures/powerups/slomo") {
-			if (operator()(out.textures.powerups.slomo, property.value)) { ++count; }
+			if (operator()(out.textures.powerups.slomo, property.value.c_str())) { ++count; }
 		} else if (property.key == "textures/powerups/sweep") {
-			if (operator()(out.textures.powerups.sweep, property.value)) { ++count; }
+			if (operator()(out.textures.powerups.sweep, property.value.c_str())) { ++count; }
 		} else if (property.key == "animations/explode") {
-			if (operator()(out.animations.explode, property.value)) { ++count; }
+			if (operator()(out.animations.explode, property.value.c_str())) { ++count; }
 		} else if (property.key == "animations/player") {
-			if (operator()(out.animations.player, property.value)) { ++count; }
+			if (operator()(out.animations.player, property.value.c_str())) { ++count; }
 		} else if (property.key == "sfx/tick_tock") {
-			if (operator()(out.sfx.tick_tock, property.value)) { ++count; }
+			if (operator()(out.sfx.tick_tock, property.value.c_str())) { ++count; }
 		} else if (property.key == "sfx/explode") {
-			if (operator()(out.sfx.explode, property.value)) { ++count; }
+			if (operator()(out.sfx.explode, property.value.c_str())) { ++count; }
 		} else if (property.key == "sfx/collect") {
-			if (operator()(out.sfx.collect, property.value)) { ++count; }
+			if (operator()(out.sfx.collect, property.value.c_str())) { ++count; }
 		} else if (property.key == "sfx/powerup") {
-			if (operator()(out.sfx.powerup, property.value)) { ++count; }
+			if (operator()(out.sfx.powerup, property.value.c_str())) { ++count; }
 		} else {
 			logger::warn("[Resources] Unrecognized key in [{}]: [{}]", uri, property.key);
 		}

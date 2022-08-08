@@ -1,7 +1,4 @@
-#include <engine/context.hpp>
-#include <util/logger.hpp>
 #include <util/util.hpp>
-#include <vulkify/graphics/resources/texture.hpp>
 #include <iomanip>
 #include <sstream>
 
@@ -23,14 +20,5 @@ std::string util::format_elapsed(vf::Time elapsed) {
 		str << s.count() << '.' << ms.count() / 100;
 	}
 	return str.str();
-}
-
-vf::Texture util::make_texture(Context const& context, std::string_view uri) {
-	auto image = vf::Image{};
-	if (!image.load(rr::data_path(context.env, uri).c_str())) {
-		logger::error("[Resources] Failed to load Image [{}]", uri);
-		return {};
-	}
-	return vf::Texture(context.vf_context, std::string(uri), image);
 }
 } // namespace rr

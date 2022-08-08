@@ -2,7 +2,7 @@
 #include <util/ptr.hpp>
 #include <vulkify/context/frame.hpp>
 #include <vulkify/graphics/primitives/mesh.hpp>
-#include <vulkify/graphics/resources/texture.hpp>
+#include <vulkify/graphics/texture.hpp>
 
 namespace rr {
 struct Layout;

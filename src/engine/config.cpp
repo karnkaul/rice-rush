@@ -1,5 +1,4 @@
 #include <engine/config.hpp>
-#include <engine/env.hpp>
 #include <util/logger.hpp>
 #include <util/property.hpp>
 #include <filesystem>
@@ -80,8 +79,8 @@ bool write(Config const& config, char const* path) {
 }
 } // namespace
 
-Config Config::load(Env const& env, const char* uri, bool create_if_absent) {
-	auto const path = exe_path(env, uri);
+Config Config::load(std::string_view const exe_dir, const char* uri, bool create_if_absent) {
+	auto const path = (fs::path(exe_dir) / uri).generic_string();
 	bool const exists = fs::is_regular_file(path);
 	auto ret = Config{};
 	if (!exists && create_if_absent && write(ret, path.c_str())) { logger::info("[Config] Default config saved to [{}]", path); }

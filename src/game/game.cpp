@@ -63,7 +63,7 @@ Game::Game(Context& context, Resources& resources) : context(context), resources
 
 	m_player = ktl::make_unique<Player>();
 	setup(*m_player);
-	m_player->sprite.instance().transform.position = layout.play_area.offset;
+	m_player->sprite.transform().position = layout.play_area.offset;
 
 	m_background = ktl::make_unique<Background>(context.vf_context);
 	m_background->set_texture(resources.textures.background, layout);

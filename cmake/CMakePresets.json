@@ -1,5 +1,5 @@
 {
-	"version": 3,
+	"version": 2,
 	"cmakeMinimumRequired": {
 		"major": 3,
 		"minor": 20,
@@ -8,55 +8,37 @@
 	"configurePresets": [
 		{
 			"name": "default",
-			"description": "Default build using Ninja",
-			"generator": "Ninja",
-			"binaryDir": "out/default",
+			"description": "Build configuration using Ninja Multi-config",
+			"generator": "Ninja Multi-Config",
+			"binaryDir": "${sourceDir}/out/default",
 			"cacheVariables": {
 				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
 			}
 		},
 		{
 			"name": "ninja-clang",
-			"description": "Base configuration using Ninja / clang",
-			"hidden": true,
+			"description": "Build configuration using Ninja Multi-config / clang",
 			"inherits": "default",
+			"binaryDir": "${sourceDir}/out/clang",
 			"cacheVariables": {
 				"CMAKE_C_COMPILER": "clang",
 				"CMAKE_CXX_COMPILER": "clang++"
 			}
 		},
 		{
-			"name": "ninja-debug",
-			"description": "Debug build using Ninja",
-			"binaryDir": "out/db",
+			"name": "ninja-ubsan",
+			"description": "UBSan build configuration using Ninja Multi-config",
 			"inherits": "default",
+			"binaryDir": "${sourceDir}/out/ubsan",
 			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "Debug"
-			}
-		},
-		{
-			"name": "ninja-release",
-			"description": "Release build using Ninja",
-			"binaryDir": "out/rl",
-			"inherits": "default",
-			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "Release"
-			}
-		},
-		{
-			"name": "ninja-relw",
-			"description": "RelWithDebInfo build using Ninja/clang",
-			"binaryDir": "out/rw",
-			"inherits": "default",
-			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "RelWithDebInfo"
+				"CMAKE_CXX_FLAGS": "-fsanitize=undefined"
 			}
 		},
 		{
 			"name": "vs19",
 			"description": "Build configuration using Visual Studio 16 (2019)",
 			"generator": "Visual Studio 16 2019",
-			"binaryDir": "out/vs",
+			"binaryDir": "${sourceDir}/out/vs",
 			"architecture": {
 				"value": "x64",
 				"strategy": "external"
@@ -69,13 +51,48 @@
 			"generator": "Visual Studio 17 2022"
 		},
 		{
-			"name": "ninja-ubsan",
-			"description": "UBSan debug build using Ninja",
-			"inherits": "ninja-debug",
-			"binaryDir": "out/ubsan",
+			"name": "pre-install",
+			"description": "Debug build using Ninja Multi-config and install prefix",
+			"inherits": "default",
+			"binaryDir": "${sourceDir}/out/pre",
 			"cacheVariables": {
-				"CMAKE_CXX_FLAGS": "-fsanitize=undefined"
+				"CMAKE_PREFIX_PATH": "${sourceDir}/out/install",
+				"RR_PREINSTALLED": "ON"
 			}
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "Debug",
+			"configurePreset": "default",
+			"configuration": "Debug"
+		},
+		{
+			"name": "Release",
+			"configurePreset": "default",
+			"configuration": "Release"
+		},
+		{
+			"name": "RelWithDebInfo",
+			"configurePreset": "default",
+			"configuration": "RelWithDebInfo"
+		}
+	],
+	"testPresets": [
+		{
+			"name": "Debug",
+			"configurePreset": "default",
+			"configuration": "Debug"
+		},
+		{
+			"name": "Release",
+			"configurePreset": "default",
+			"configuration": "Release"
+		},
+		{
+			"name": "RelWithDebInfo",
+			"configurePreset": "default",
+			"configuration": "RelWithDebInfo"
 		}
 	]
 }

@@ -1,7 +1,7 @@
 #pragma once
-#include <engine/sprite.hpp>
 #include <engine/trigger.hpp>
 #include <game/game_object.hpp>
+#include <vulkify/graphics/primitives/sprite.hpp>
 #include <functional>
 
 namespace rr {
@@ -42,8 +42,8 @@ class Powerup : public GameObject {
 	void update_active(vf::Time dt);
 	void update_effect(vf::Time dt);
 
-	Sprite::Sheet m_sheet{};
-	Sprite m_sprite{};
+	vf::Sprite::Sheet m_sheet{};
+	vf::Sprite m_sprite{};
 	Trigger m_trigger{};
 	struct {
 		ktl::kunique_ptr<Modifier> modifier{};

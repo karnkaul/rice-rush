@@ -34,7 +34,7 @@ class Player : public GameObject {
   private:
 	void setup() override;
 	void tick(DeltaTime dt) override;
-	void draw(vf::Frame const& frame) const override { sprite.draw(frame); }
+	void draw(vf::Frame const& frame) const override { frame.draw(sprite); }
 
 	struct {
 		Health health{};

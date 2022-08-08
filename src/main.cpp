@@ -1,23 +1,54 @@
-#include <engine/config.hpp>
+#include <build_version.hpp>
 #include <engine/context.hpp>
-#include <engine/env.hpp>
 #include <game/background.hpp>
 #include <game/cooker_pool.hpp>
 #include <game/game.hpp>
 #include <game/player.hpp>
 #include <game/powerup.hpp>
 #include <game/resources.hpp>
-#include <util/collection.hpp>
+#include <util/io.hpp>
 #include <util/logger.hpp>
 #include <util/random.hpp>
 #include <util/util.hpp>
+#include <filesystem>
 
+namespace rr {
 namespace {
-using namespace std::chrono_literals;
+namespace fs = std::filesystem;
 
-std::optional<rr::Context> make_context(int argc, char const* const argv[]) {
-	auto env = rr::Env::make(argc, argv);
-	auto config = rr::Config::load(env, "config.txt");
+fs::path find_data(fs::path start) {
+	while (!start.empty() && start.parent_path() != start) {
+		auto ret = start / "data";
+		if (fs::is_directory(ret)) { return ret; }
+		start = start.parent_path();
+	}
+	return {};
+}
+
+bool parse_arg(std::string_view const arg) {
+	if (arg == "--version") {
+		auto const& v = version_v;
+		logger::print_verbatim(logger::Pipe::StdOut, ktl::kformat("Rice Rush v{}.{}.{}", v.major, v.minor, v.patch).c_str());
+		return false;
+	}
+	return true;
+}
+
+std::optional<int> parse_args(int argc, char const* const argv[]) {
+	if (argc < 1) {
+		logger::error("Fatal error: no arguments passed to main");
+		return EXIT_FAILURE;
+	}
+	for (int i = 1; i < argc; ++i) {
+		if (!parse_arg(argv[i])) { return EXIT_SUCCESS; }
+	}
+	return {};
+}
+
+std::optional<Context> make_context(std::string_view const arg0) {
+	auto const exe = fs::path{arg0};
+	auto const exe_dir = fs::absolute(exe.parent_path());
+	auto config = Config::load(exe_dir.generic_string(), "config.txt");
 	auto builder = vf::Builder{};
 	builder.set_title("Rice Rush").set_extent(config.extent).set_anti_aliasing(config.antiAliasing).set_vsyncs({config.vsync});
 	auto vf = builder.build();
@@ -25,7 +56,7 @@ std::optional<rr::Context> make_context(int argc, char const* const argv[]) {
 		logger::error("Failed to create vulkify instance");
 		return {};
 	}
-	auto ret = rr::Context{.env = std::move(env), .vf_context = std::move(*vf)};
+	auto ret = Context{.vf_context = std::move(*vf)};
 	ret.capo_instance = capo::Instance::make();
 	if (!ret.capo_instance) {
 		logger::error("Failed to create capo instance");
@@ -34,22 +65,15 @@ std::optional<rr::Context> make_context(int argc, char const* const argv[]) {
 	ret.config = std::move(config);
 	ret.basis.scale = ret.basis_scale(ret.vf_context.framebuffer_extent());
 	ret.audio = *ret.capo_instance;
+
+	if (auto data = find_data(exe_dir); !data.empty()) { io::mount_dir(data.generic_string().c_str()); }
+
 	return ret;
 }
 
-using rr::util::random_range;
-
-template <int MaxIter = 100>
-glm::vec2 random_cooker_pos(glm::vec2 const zone, glm::vec2 const offset, rr::CookerPool const& pool) {
-	auto make_pos = [zone, offset] { return random_range(-zone, zone) + offset; };
-	auto pos = make_pos();
-	for (int loops{}; loops < MaxIter && pool.intersecting(rr::Trigger{pos, pool.trigger_diameter}); ++loops) { pos = make_pos(); }
-	return pos;
-}
-
-struct DebugControls : rr::KeyListener {
-	rr::Ptr<rr::Game> game{};
-	rr::Ptr<rr::Powerup> powerup{};
+struct DebugControls : KeyListener {
+	Ptr<Game> game{};
+	Ptr<Powerup> powerup{};
 
 	void operator()(vf::KeyEvent const& key) override {
 		if (key(vf::Key::eEnter, vf::Action::ePress)) { game->cooker_pool()->spawn(); }
@@ -62,13 +86,13 @@ struct DebugControls : rr::KeyListener {
 				// powerup->activate_sweep();
 			}
 		}
-		if (key(vf::Key::eT, vf::Action::eRelease, vf::Mod::eCtrl)) { game->flags.flip(rr::Game::Flag::eRenderTriggers); }
+		if (key(vf::Key::eT, vf::Action::eRelease, vf::Mod::eCtrl)) { game->flags.flip(Game::Flag::eRenderTriggers); }
 		if (key(vf::Key::eW, vf::Action::eRelease, vf::Mod::eCtrl)) { game->context.vf_context.close(); }
 	}
 };
 
-bool load_resources(rr::Resources& out, rr::Context& context) {
-	auto loader = rr::Resources::Loader{context};
+bool load_resources(Resources& out, Context& context) {
+	auto loader = Resources::Loader{context};
 	if (!loader(out, "manifest.txt")) {
 		logger::warn("Failed to load game resources!");
 		return false;
@@ -76,19 +100,19 @@ bool load_resources(rr::Resources& out, rr::Context& context) {
 	return true;
 }
 
-void run(rr::Context context) {
-	auto resources = rr::Resources{};
+void run(Context context) {
+	auto resources = Resources{};
 	load_resources(resources, context);
-	auto game = rr::Game{context, resources};
+	auto game = Game{context, resources};
 	auto debug = DebugControls{};
 	debug.game = &game;
 
-	if constexpr (rr::debug_v) {
+	if constexpr (logger::debug_v) {
 		game.attach(&debug);
-		// game.flags.set(rr::Game::Flag::eRenderTriggers);
+		// game.flags.set(Game::Flag::eRenderTriggers);
 	}
 
-	game.set(rr::Game::State::ePlay);
+	game.set(Game::State::ePlay);
 	debug.powerup = game.powerup();
 
 	context.vf_context.show();
@@ -101,9 +125,12 @@ void run(rr::Context context) {
 	}
 }
 } // namespace
+} // namespace rr
 
 int main(int argc, char* argv[]) {
-	auto context = make_context(argc, argv);
+	auto io_inst = rr::io::Instance(argv[0]);
+	if (auto ret = rr::parse_args(argc, argv)) { return *ret; }
+	auto context = rr::make_context(argv[0]);
 	if (!context) { return EXIT_FAILURE; }
-	run(std::move(*context));
+	rr::run(std::move(*context));
 }

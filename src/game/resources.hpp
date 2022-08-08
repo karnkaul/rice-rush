@@ -1,9 +1,10 @@
 #pragma once
 #include <capo/sound.hpp>
-#include <engine/sprite.hpp>
+#include <ktl/byte_array.hpp>
 #include <util/index_timeline.hpp>
 #include <util/ptr.hpp>
 #include <vulkify/core/time.hpp>
+#include <vulkify/graphics/primitives/sprite.hpp>
 #include <vulkify/ttf/ttf.hpp>
 
 namespace rr {
@@ -13,7 +14,7 @@ struct SheetAnimation {
 	using Sequence = IndexTimeline::Sequence;
 
 	vf::Texture texture{};
-	Sprite::Sheet sheet{};
+	vf::Sprite::Sheet sheet{};
 	Sequence sequence{};
 };
 
@@ -51,12 +52,13 @@ struct Resources {
 
 struct Resources::Loader {
 	Context& context;
+	ktl::byte_array buffer{};
 
-	bool operator()(vf::Ttf& out, std::string_view uri) const;
-	bool operator()(vf::Texture& out, std::string_view uri, Ptr<vf::TextureCreateInfo const> info = {}) const;
-	bool operator()(SheetAnimation& out_anim, std::string_view uri) const;
-	bool operator()(capo::Sound& out, std::string_view uri) const;
+	bool operator()(vf::Ttf& out, char const* uri);
+	bool operator()(vf::Texture& out, char const* uri, Ptr<vf::TextureCreateInfo const> info = {});
+	bool operator()(SheetAnimation& out_anim, char const* uri);
+	bool operator()(capo::Sound& out, char const* uri);
 
-	bool operator()(Resources& out, std::string_view uri) const;
+	bool operator()(Resources& out, char const* uri);
 };
 } // namespace rr

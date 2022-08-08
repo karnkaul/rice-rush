@@ -4,8 +4,6 @@
 #include <string>
 
 namespace rr {
-struct Env;
-
 struct Config {
 	vf::AntiAliasing antiAliasing{vf::AntiAliasing::eNone};
 	vf::VSync vsync{vf::VSync::eOn};
@@ -13,6 +11,6 @@ struct Config {
 	float sfx_gain{1.0f};
 	float music_gain{1.0f};
 
-	static Config load(Env const& env, char const* uri, bool create_if_absent = true);
+	static Config load(std::string_view exe_dir, char const* uri, bool create_if_absent = true);
 };
 } // namespace rr

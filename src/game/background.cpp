@@ -27,9 +27,8 @@ void Background::set_texture(vf::Texture const& texture, Layout const& layout, s
 		xy.y -= height;
 	}
 
-	m_mesh = vf::Mesh(*m_vf_context, "background");
-	m_mesh.gbo.write(std::move(geometry));
-	m_mesh.texture = texture.handle();
+	m_mesh = vf::Mesh{*m_vf_context, texture.handle()};
+	m_mesh.buffer.write(std::move(geometry));
 }
 
 void Background::draw(vf::Frame const& frame) const { frame.draw(m_mesh); }

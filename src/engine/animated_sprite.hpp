@@ -1,14 +1,16 @@
 #pragma once
-#include <engine/sprite.hpp>
 #include <util/index_timeline.hpp>
+#include <vulkify/graphics/primitives/sprite.hpp>
 
 namespace rr {
-class AnimatedSprite : public Sprite {
+struct Context;
+
+class AnimatedSprite : public vf::Sprite {
   public:
 	using Sequence = IndexTimeline::Sequence;
 
 	AnimatedSprite() = default;
-	AnimatedSprite(Context const& context, std::string name = "animated_sprite") : Sprite(context, std::move(name)) {}
+	AnimatedSprite(Context const& context);
 
 	IndexTimeline timeline{};
 
@@ -17,5 +19,8 @@ class AnimatedSprite : public Sprite {
 	AnimatedSprite& unset_sheet();
 
 	void tick(vf::Time dt);
+
+  private:
+	Ptr<Sprite::Sheet const> m_sheet{};
 };
 } // namespace rr
