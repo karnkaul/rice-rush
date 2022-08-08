@@ -10,8 +10,6 @@ target_sources(${PROJECT_NAME} PRIVATE
   engine/framerate.hpp
   engine/instanced.hpp
   engine/keyboard.hpp
-  engine/sprite.cpp
-  engine/sprite.hpp
   engine/trigger_renderer.cpp
   engine/trigger_renderer.hpp
   engine/trigger.hpp

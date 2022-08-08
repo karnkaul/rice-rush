@@ -116,8 +116,7 @@ bool Resources::Loader::operator()(SheetAnimation& out_anim, char const* uri) {
 	auto image = vf::Image{};
 	if (!load(buffer, image, info.image_uri.c_str())) { return false; }
 	out_anim.texture = vf::Texture(context.vf_context, image);
-	out_anim.sheet = &out_anim.texture;
-	out_anim.sheet.set_uvs(static_cast<std::size_t>(info.tile_count.y), static_cast<std::size_t>(info.tile_count.x));
+	out_anim.sheet.set_uvs(&out_anim.texture, static_cast<vf::Sprite::UvIndex>(info.tile_count.y), static_cast<vf::Sprite::UvIndex>(info.tile_count.x));
 	if (out_anim.sequence.end <= out_anim.sequence.begin) { out_anim.sequence.end = out_anim.sheet.uv_count(); }
 
 	return true;

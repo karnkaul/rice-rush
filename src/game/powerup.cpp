@@ -132,7 +132,7 @@ void Powerup::tick(DeltaTime dt) {
 }
 
 void Powerup::draw(vf::Frame const& frame) const {
-	if (active() && !m_active.effect) { m_sprite.draw(frame); }
+	if (active() && !m_active.effect) { frame.draw(m_sprite); }
 }
 
 void Powerup::add_triggers(std::vector<Ptr<Trigger const>>& out) const {
@@ -148,7 +148,7 @@ bool Powerup::can_activate() const {
 }
 
 void Powerup::activate(Ptr<vf::Texture const> texture) {
-	m_sheet.set_texture(texture);
+	m_sheet.set_texture(texture->handle());
 	m_sprite.set_size(glm::vec2{diameter}).set_sheet(&m_sheet);
 	m_sprite.transform().position = m_trigger.centre = random_position();
 	m_trigger.diameter = diameter * (1.0f + squish_coeff);

@@ -39,7 +39,7 @@ void ExplodePool::tick(DeltaTime dt) {
 }
 
 void ExplodePool::draw(vf::Frame const& frame) const {
-	for (auto const& entry : m_active) { entry.sprite.draw(frame); }
+	for (auto const& entry : m_active) { frame.draw(entry.sprite); }
 }
 
 auto ExplodePool::make_entry() -> Entry& {

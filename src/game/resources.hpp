@@ -1,10 +1,10 @@
 #pragma once
 #include <capo/sound.hpp>
-#include <engine/sprite.hpp>
 #include <ktl/byte_array.hpp>
 #include <util/index_timeline.hpp>
 #include <util/ptr.hpp>
 #include <vulkify/core/time.hpp>
+#include <vulkify/graphics/primitives/sprite.hpp>
 #include <vulkify/ttf/ttf.hpp>
 
 namespace rr {
@@ -14,7 +14,7 @@ struct SheetAnimation {
 	using Sequence = IndexTimeline::Sequence;
 
 	vf::Texture texture{};
-	Sprite::Sheet sheet{};
+	vf::Sprite::Sheet sheet{};
 	Sequence sequence{};
 };
 

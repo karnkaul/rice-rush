@@ -13,7 +13,7 @@ endif()
 
 # project parameters
 set(project_name rice-rush)
-set(project_version "1.1.0")
+set(project_version "1.2.0")
 set(project_version_name build_version) # name of variable in generated header
 
 project(${project_name} VERSION "${project_version}")
